@@ -138,7 +138,7 @@ namespace Buildersoft.Andy.X.Client
                 HttpResponseMessage response = await _client.GetAsync(getUrl);
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    _logger.LogInformation($"andyx-persistent://{andyXOptions.Tenant} connected");
+                    _logger.LogInformation($"andyx-persistent://{andyXOptions.Tenant}: connected");
                     return true;
                 }
             }
