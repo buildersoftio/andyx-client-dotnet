@@ -8,7 +8,6 @@ namespace Buildersoft.Andy.X.Client.Configurations
 {
     public class AndyXOptions
     {
-        public string Protocol { get; set; }
         public string Uri { get; set; }
         public string Token { get; set; }
 
@@ -16,7 +15,6 @@ namespace Buildersoft.Andy.X.Client.Configurations
         public string Product { get; set; }
         public string Component { get; set; }
         public string Book { get; set; }
-        public string Reader { get; set; }
 
         public ReaderOptions ReaderOptions { get; set; }
         public WriterOptions WriterOptions { get; set; }
@@ -28,6 +26,19 @@ namespace Buildersoft.Andy.X.Client.Configurations
         {
             ReaderOptions = new ReaderOptions();
             WriterOptions = new WriterOptions();
+        }
+
+        public static AndyXOptions Create(AndyXOptions andyXOptions)
+        {
+            return new AndyXOptions()
+            {
+                Uri = andyXOptions.Uri,
+                HttpClientHandler = andyXOptions.HttpClientHandler,
+                Logger = andyXOptions.Logger,
+                Tenant = andyXOptions.Tenant,
+                Product = andyXOptions.Product,
+                Token = andyXOptions.Token
+            };
         }
     }
 }
