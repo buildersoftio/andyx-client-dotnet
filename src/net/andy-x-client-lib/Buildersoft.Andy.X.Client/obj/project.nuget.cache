@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "oDKbhOew8AUmJMF2220QvSTzoGSBU3njGKdAHzzXV/VRCF1l6UYc/kG494KnfhF41fJ0hL9HU0ofDjRdJdYKwg==",
+  "dgSpecHash": "DyqvxUfeMx37iDPzdh+1tcnUtwbUQs394i3wD+jl7YtMNo1w5wNR1QhFc5lyvzoB/bfu77/rtw0STJl4axHkoQ==",
   "success": true,
   "projectFilePath": "C:\\Users\\enesh\\source\\repos\\andyxclient-github\\src\\net\\andy-x-client-lib\\Buildersoft.Andy.X.Client\\Buildersoft.Andy.X.Client.csproj",
   "expectedPackageFiles": [
@@ -16,8 +16,10 @@
     "C:\\Users\\enesh\\.nuget\\packages\\system.buffers\\4.5.1\\system.buffers.4.5.1.nupkg.sha512",
     "C:\\Users\\enesh\\.nuget\\packages\\system.diagnostics.diagnosticsource\\5.0.0\\system.diagnostics.diagnosticsource.5.0.0.nupkg.sha512",
     "C:\\Users\\enesh\\.nuget\\packages\\system.memory\\4.5.4\\system.memory.4.5.4.nupkg.sha512",
-    "C:\\Users\\enesh\\.nuget\\packages\\system.numerics.vectors\\4.4.0\\system.numerics.vectors.4.4.0.nupkg.sha512",
+    "C:\\Users\\enesh\\.nuget\\packages\\system.numerics.vectors\\4.5.0\\system.numerics.vectors.4.5.0.nupkg.sha512",
     "C:\\Users\\enesh\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\5.0.0\\system.runtime.compilerservices.unsafe.5.0.0.nupkg.sha512",
+    "C:\\Users\\enesh\\.nuget\\packages\\system.text.encodings.web\\5.0.0\\system.text.encodings.web.5.0.0.nupkg.sha512",
+    "C:\\Users\\enesh\\.nuget\\packages\\system.text.json\\5.0.0\\system.text.json.5.0.0.nupkg.sha512",
     "C:\\Users\\enesh\\.nuget\\packages\\system.threading.tasks.extensions\\4.5.4\\system.threading.tasks.extensions.4.5.4.nupkg.sha512"
   ],
   "logs": []
