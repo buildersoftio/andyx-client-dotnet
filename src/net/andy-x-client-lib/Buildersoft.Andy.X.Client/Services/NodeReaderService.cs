@@ -35,6 +35,10 @@ namespace Buildersoft.Andy.X.Client
                 _connection.On<MessageReceivedArgs>("MessageReceived", received => MessageReceived?.Invoke(received));
             }
 
+            /// <summary>
+            /// Connect to Andy X Node
+            /// </summary>
+            /// <returns></returns>
             public async Task ConnectAsync()
             {
                 await _connection.StartAsync().ContinueWith(task =>
@@ -46,6 +50,10 @@ namespace Buildersoft.Andy.X.Client
                 });
             }
 
+            /// <summary>
+            /// Disconnect from Andy X Node
+            /// </summary>
+            /// <returns></returns>
             public async Task CloseConnectionAsync()
             {
                 await _connection.StopAsync().ContinueWith(task =>
@@ -56,7 +64,6 @@ namespace Buildersoft.Andy.X.Client
                     }
                 });
             }
-
 
             /// <summary>
             /// Send to Andy X Node - Message as acknowledged
