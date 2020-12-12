@@ -29,8 +29,8 @@ namespace Buildersoft.Andy.X.Client.Configurations
 
     public enum ReaderAs
     {
-        Consumer = 0,
-        Subscription = 1,
+        Subscription = 0,
+        Consumer = 1,
     }
 
 }
