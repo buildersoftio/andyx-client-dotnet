@@ -1,5 +1,6 @@
 ﻿using Buildersoft.Andy.X.Client.Configurations;
 using Buildersoft.Andy.X.Client.Configurations.Logging;
+using Buildersoft.Andy.X.Client.Interfaces;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ namespace Buildersoft.Andy.X.Client
     /// <summary>
     /// connect to andy x node
     /// </summary>
-    public class AndyXClient
+    public class AndyXClient : IAndyXClientBuilder
     {
         private HttpClient _client;
         private ILogger _logger;
@@ -56,7 +57,7 @@ namespace Buildersoft.Andy.X.Client
         /// <example>https://{host}</example>
         /// <param name="url">url where andy x node is hosted</param>
         /// <returns>andyxclient instance</returns>
-        public AndyXClient Url(string url)
+        public IAndyXClientBuilder Url(string url)
         {
             andyXOptions.Uri = url;
             return this;
@@ -67,7 +68,7 @@ namespace Buildersoft.Andy.X.Client
         /// </summary>
         /// <param name="token">Jwt Token</param>
         /// <returns>andyxclient instance</returns>
-        public AndyXClient Token(string token)
+        public IAndyXClientBuilder Token(string token)
         {
             andyXOptions.Token = token;
             return this;
@@ -78,7 +79,7 @@ namespace Buildersoft.Andy.X.Client
         /// </summary>
         /// <param name="tenant">type string</param>
         /// <returns></returns>
-        public AndyXClient Tenant(string tenant)
+        public IAndyXClientBuilder Tenant(string tenant)
         {
             andyXOptions.Tenant = tenant;
             return this;
@@ -89,7 +90,7 @@ namespace Buildersoft.Andy.X.Client
         /// </summary>
         /// <param name="product">type string</param>
         /// <returns>andyxclient instance</returns>
-        public AndyXClient Product(string product)
+        public IAndyXClientBuilder Product(string product)
         {
             andyXOptions.Product = product;
             return this;
@@ -100,7 +101,7 @@ namespace Buildersoft.Andy.X.Client
         /// </summary>
         /// <param name="factory">an implementation of ILoggerFactory</param>
         /// <returns>andyxclient instance</returns>
-        public AndyXClient Logger(ILoggerFactory factory)
+        public IAndyXClientBuilder Logger(ILoggerFactory factory)
         {
             andyXOptions.Logger = new AndyXLogger(factory);
             return this;
@@ -111,7 +112,7 @@ namespace Buildersoft.Andy.X.Client
         /// </summary>
         /// <param name="httpClientHandler">HttpClientHandler</param>
         /// <returns></returns>
-        public AndyXClient HttpClientHandler(HttpClientHandler httpClientHandler)
+        public IAndyXClientBuilder HttpClientHandler(HttpClientHandler httpClientHandler)
         {
             andyXOptions.HttpClientHandler = httpClientHandler;
             return this;
@@ -165,6 +166,15 @@ namespace Buildersoft.Andy.X.Client
                 .Logger
                 .GetLoggerFactory()
                 .CreateLogger<AndyXClient>();
+        }
+
+        /// <summary>
+        /// Get Andy X Client
+        /// </summary>
+        /// <returns>AndyXClient object</returns>
+        public IAndyXClientBuilder GetAndyXClient()
+        {
+            return this;
         }
     }
 }
