@@ -1,5 +1,5 @@
 ﻿using Buildersoft.Andy.X.Client.Configurations;
-using Buildersoft.Andy.X.Client.Interfaces;
+using Buildersoft.Andy.X.Client.Abstraction;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 

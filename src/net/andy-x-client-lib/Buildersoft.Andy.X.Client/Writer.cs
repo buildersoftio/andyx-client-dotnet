@@ -90,7 +90,7 @@ namespace Buildersoft.Andy.X.Client
 
             _ = _client.PostAsync(componentRequestUrl, null).Result;
 
-            HttpResponseMessage response = _client.GetAsync(bookRequestUrl).Result;
+            var response = _client.GetAsync(bookRequestUrl).Result;
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 return this;
 
@@ -98,7 +98,7 @@ namespace Buildersoft.Andy.X.Client
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 return this;
 
-            throw new Exception("Can not create Writer");
+            throw new Exception("Writer cannot be created");
         }
 
         /// <summary>
@@ -125,10 +125,9 @@ namespace Buildersoft.Andy.X.Client
             {
                 string jsonMessage = message.ObjectToJson<TEntity>();
                 string postUrl = $"{_andyXOptions.Uri}/{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_andyXOptions.Component}/{_andyXOptions.Book}";
+                var body = new StringContent(jsonMessage, UnicodeEncoding.UTF8, "application/json");
 
-                var stringContent = new StringContent(jsonMessage, UnicodeEncoding.UTF8, "application/json");
-
-                HttpResponseMessage response = _client.PostAsync(postUrl, stringContent).Result;
+                HttpResponseMessage response = await _client.PostAsync(postUrl, body);
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     string responseAsString = await response.Content.ReadAsStringAsync();
@@ -137,7 +136,8 @@ namespace Buildersoft.Andy.X.Client
                     return responseAsString.JsonToObject<Guid>();
                 }
             }
-            _logger.LogError($"Message failed to be written");
+
+            _logger.LogError($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_andyXOptions.Component}/{_andyXOptions.Book}/messages: failed");
             return Guid.Empty;
         }
 
@@ -152,12 +152,10 @@ namespace Buildersoft.Andy.X.Client
             if (_andyXOptions.WriterOptions.SchemaType == SchemaTypes.Json)
             {
                 string jsonMessage = message.ObjectToJson<TEntity>();
-
                 string postUrl = $"{_andyXOptions.Uri}/{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_andyXOptions.Component}/{_andyXOptions.Book}?msgId={msgId}";
+                var body = new StringContent(jsonMessage, UnicodeEncoding.UTF8, "application/json");
 
-                var stringContent = new StringContent(jsonMessage, UnicodeEncoding.UTF8, "application/json");
-
-                HttpResponseMessage response = _client.PostAsync(postUrl, stringContent).Result;
+                HttpResponseMessage response = await _client.PostAsync(postUrl, body);
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     string responseAsString = await response.Content.ReadAsStringAsync();
@@ -165,7 +163,8 @@ namespace Buildersoft.Andy.X.Client
                     return responseAsString.JsonToObject<Guid>();
                 }
             }
-            _logger.LogError($"Message failed to be written");
+
+            _logger.LogError($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_andyXOptions.Component}/{_andyXOptions.Book}/messages: failed");
             return Guid.Empty;
         }
     }

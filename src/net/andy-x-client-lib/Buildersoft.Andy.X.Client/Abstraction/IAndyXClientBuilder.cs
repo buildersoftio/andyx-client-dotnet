@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 
-namespace Buildersoft.Andy.X.Client.Interfaces
+namespace Buildersoft.Andy.X.Client.Abstraction
 {
    public interface IAndyXClientBuilder
     {

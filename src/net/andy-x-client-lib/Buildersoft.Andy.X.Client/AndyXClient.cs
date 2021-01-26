@@ -1,6 +1,6 @@
 ﻿using Buildersoft.Andy.X.Client.Configurations;
 using Buildersoft.Andy.X.Client.Configurations.Logging;
-using Buildersoft.Andy.X.Client.Interfaces;
+using Buildersoft.Andy.X.Client.Abstraction;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -145,7 +145,7 @@ namespace Buildersoft.Andy.X.Client
             }
             catch (Exception e)
             {
-                _logger.LogError($"Error on building the AndyXClient, error description {e.Message}");
+                _logger.LogError($"andyx-persistent://{andyXOptions.Tenant}/errors/details : {e.Message}");
             }
 
             return false;
@@ -158,7 +158,7 @@ namespace Buildersoft.Andy.X.Client
         public AndyXOptions GetAndyXOptions()
         {
             return andyXOptions;
-        } 
+        }
 
         private void InitializeLogger()
         {
