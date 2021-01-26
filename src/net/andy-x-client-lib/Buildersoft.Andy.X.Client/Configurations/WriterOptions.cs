@@ -8,7 +8,9 @@ namespace Buildersoft.Andy.X.Client.Configurations
     {
         public string Name { get; set; }
         public WriterTypes WriterType { get; set; }
-        public SchemaTypes SchemaType { get; set; }
+        public DataTypes DataType { get; set; }
+        public SchemaOptions Schema { get; set; }
+
     }
 
     public enum WriterTypes
@@ -17,7 +19,7 @@ namespace Buildersoft.Andy.X.Client.Configurations
         StreamAfterStored = 1
     }
 
-    public enum SchemaTypes
+    public enum DataTypes
     {
         Json,
         Text,

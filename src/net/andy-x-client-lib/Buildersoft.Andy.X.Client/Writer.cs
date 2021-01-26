@@ -55,11 +55,22 @@ namespace Buildersoft.Andy.X.Client
         /// <summary>
         /// Select file format, default is Json. Data will be transfered by andy x in the selected file format
         /// </summary>
-        /// <param name="schemaType">SchemaTypes enum</param>
+        /// <param name="dataType">DataTypes enum</param>
         /// <returns>writer instance</returns>
-        public Writer<TEntity> Schema(SchemaTypes schemaType)
+        public Writer<TEntity> MessageType(DataTypes dataType)
         {
-            _andyXOptions.WriterOptions.SchemaType = schemaType;
+            _andyXOptions.WriterOptions.DataType = dataType;
+            return this;
+        }
+
+        /// <summary>
+        /// Configure schema for accepting messages in book.
+        /// </summary>
+        /// <param name="schemaOptions">Action type SchemaOptions</param>
+        /// <returns></returns>
+        public Writer<TEntity> Schema(Action<SchemaOptions> schemaOptions)
+        {
+            schemaOptions.Invoke(_andyXOptions.WriterOptions.Schema);
             return this;
         }
 
@@ -84,21 +95,27 @@ namespace Buildersoft.Andy.X.Client
         {
             string componentRequestUrl = $"{_andyXOptions.Uri}/api/v1/tenants/{_andyXOptions.Tenant}" +
                     $"/products/{_andyXOptions.Product}/components/{_andyXOptions.Component}";
-
-            string bookRequestUrl = $"{_andyXOptions.Uri}/api/v1/tenants/{_andyXOptions.Tenant}" +
-                   $"/products/{_andyXOptions.Product}/components/{_andyXOptions.Component}/books/{_andyXOptions.Book}";
+            string bookRequestUrl = $"{componentRequestUrl}/books/{_andyXOptions.Book}";
+            string schemaRequestUrl = $"{bookRequestUrl}/schema?isSchemaValid={_andyXOptions.WriterOptions.Schema.SchemaValidationStatus}";
 
             _ = _client.PostAsync(componentRequestUrl, null).Result;
 
+            var body = new StringContent("{}", UnicodeEncoding.UTF8, "application/json");
+            if (_andyXOptions.WriterOptions.Schema.SchemaValidationStatus == true)
+                body = new StringContent(_andyXOptions.WriterOptions.Schema.Schema, UnicodeEncoding.UTF8, "application/json");
+
             var response = _client.GetAsync(bookRequestUrl).Result;
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                _client.PostAsync(schemaRequestUrl, body);
                 return this;
+            }
 
-            response = _client.PostAsync(bookRequestUrl, null).Result;
+            response = _client.PostAsync(bookRequestUrl, body).Result;
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 return this;
 
-            throw new Exception("Writer cannot be created");
+            throw new Exception($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_andyXOptions.Component}/{_andyXOptions.Book}/writer: creation failed");
         }
 
         /// <summary>
@@ -121,7 +138,7 @@ namespace Buildersoft.Andy.X.Client
         /// <returns>Message id</returns>
         public async Task<Guid> WriteAsync(TEntity message)
         {
-            if (_andyXOptions.WriterOptions.SchemaType == SchemaTypes.Json)
+            if (_andyXOptions.WriterOptions.DataType == DataTypes.Json)
             {
                 string jsonMessage = message.ObjectToJson<TEntity>();
                 string postUrl = $"{_andyXOptions.Uri}/{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_andyXOptions.Component}/{_andyXOptions.Book}";
@@ -149,7 +166,7 @@ namespace Buildersoft.Andy.X.Client
         /// <returns>Message id</returns>
         public async Task<Guid> WriteAsync(Guid msgId, TEntity message)
         {
-            if (_andyXOptions.WriterOptions.SchemaType == SchemaTypes.Json)
+            if (_andyXOptions.WriterOptions.DataType == DataTypes.Json)
             {
                 string jsonMessage = message.ObjectToJson<TEntity>();
                 string postUrl = $"{_andyXOptions.Uri}/{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_andyXOptions.Component}/{_andyXOptions.Book}?msgId={msgId}";

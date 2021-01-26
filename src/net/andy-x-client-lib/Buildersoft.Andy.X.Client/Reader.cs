@@ -116,20 +116,25 @@ namespace Buildersoft.Andy.X.Client
             nodeService.ReaderDisconnected += NodeService_ReaderDisconnected;
 
             string componentRequestUrl = $"{_andyXOptions.Uri}/api/v1/tenants/{_andyXOptions.Tenant}" +
-                $"/products/{_andyXOptions.Product}/components/{_andyXOptions.Component}";
-
-            string bookRequestUrl = $"{_andyXOptions.Uri}/api/v1/tenants/{_andyXOptions.Tenant}" +
-                $"/products/{_andyXOptions.Product}/components/{_andyXOptions.Component}/books/{_andyXOptions.Book}";
-
+                    $"/products/{_andyXOptions.Product}/components/{_andyXOptions.Component}";
+            string bookRequestUrl = $"{componentRequestUrl}/books/{_andyXOptions.Book}";
+            string schemaRequestUrl = $"{bookRequestUrl}/schema?isSchemaValid={_andyXOptions.WriterOptions.Schema.SchemaValidationStatus}";
 
             _ = _client.PostAsync(componentRequestUrl, null).Result;
 
-            HttpResponseMessage response = _client.GetAsync(bookRequestUrl).Result;
+            var body = new StringContent("{}", UnicodeEncoding.UTF8, "application/json");
+            if (_andyXOptions.ReaderOptions.Schema.SchemaValidationStatus == true)
+                body = new StringContent(_andyXOptions.ReaderOptions.Schema.Schema, UnicodeEncoding.UTF8, "application/json");
+
+            var response = _client.GetAsync(bookRequestUrl).Result;
             if (response.StatusCode == HttpStatusCode.OK)
+            {
+                _client.PostAsync(schemaRequestUrl, body);
                 isBuild = true;
+            }
             else
             {
-                response = _client.PostAsync(bookRequestUrl, null).Result;
+                response = _client.PostAsync(bookRequestUrl, body).Result;
                 if (response.StatusCode == HttpStatusCode.OK)
                     isBuild = true;
             }
@@ -182,6 +187,7 @@ namespace Buildersoft.Andy.X.Client
 
             // Trigger MessageReceived with message data
             MessageReceived?.Invoke(this, new MessageEventArgs(obj.Message.ToString().TryJsonToObject<TEntity>()));
+            
             _logger.LogInformation($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_andyXOptions.Component}/{_andyXOptions.Book}/readers/{_andyXOptions.ReaderOptions.Name}?msgId={obj.MessageId}: processed");
 
             await AcknowledgeThisMessage(obj);

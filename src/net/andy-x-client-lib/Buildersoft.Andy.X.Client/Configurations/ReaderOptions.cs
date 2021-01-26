@@ -9,6 +9,7 @@ namespace Buildersoft.Andy.X.Client.Configurations
         public string Name { get; set; }
         public ReaderTypes ReaderType { get; set; }
         public ReaderAs ReaderAs { get; set; }
+        public SchemaOptions Schema { get; set; }
     }
 
     public enum ReaderTypes

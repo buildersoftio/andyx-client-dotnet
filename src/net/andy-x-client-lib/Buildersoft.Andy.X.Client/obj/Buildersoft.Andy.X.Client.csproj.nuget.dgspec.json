@@ -83,6 +83,10 @@
               "version": "[2.1.0, )",
               "autoReferenced": true
             },
+            "NJsonSchema": {
+              "target": "Package",
+              "version": "[10.3.3, )"
+            },
             "System.Text.Json": {
               "target": "Package",
               "version": "[5.0.0, )"
@@ -114,6 +118,10 @@
             "Microsoft.Extensions.Logging.Abstractions": {
               "target": "Package",
               "version": "[5.0.0, )"
+            },
+            "NJsonSchema": {
+              "target": "Package",
+              "version": "[10.3.3, )"
             },
             "System.Text.Json": {
               "target": "Package",
@@ -151,6 +159,10 @@
             "Microsoft.Extensions.Logging.Abstractions": {
               "target": "Package",
               "version": "[5.0.0, )"
+            },
+            "NJsonSchema": {
+              "target": "Package",
+              "version": "[10.3.3, )"
             },
             "System.Text.Json": {
               "target": "Package",
@@ -195,6 +207,10 @@
               "version": "[2.0.3, )",
               "autoReferenced": true
             },
+            "NJsonSchema": {
+              "target": "Package",
+              "version": "[10.3.3, )"
+            },
             "System.Text.Json": {
               "target": "Package",
               "version": "[5.0.0, )"
@@ -226,6 +242,10 @@
             "Microsoft.Extensions.Logging.Abstractions": {
               "target": "Package",
               "version": "[5.0.0, )"
+            },
+            "NJsonSchema": {
+              "target": "Package",
+              "version": "[10.3.3, )"
             },
             "System.Text.Json": {
               "target": "Package",
