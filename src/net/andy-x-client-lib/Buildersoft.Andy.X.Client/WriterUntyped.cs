@@ -14,6 +14,7 @@ namespace Buildersoft.Andy.X.Client
         private readonly HttpClient _client;
         private readonly ILogger _logger;
         private readonly AndyXOptions _andyXOptions;
+        private readonly WriterOptions _writerOptions;
 
         public Writer(AndyXClient andyClient)
         {
@@ -37,7 +38,7 @@ namespace Buildersoft.Andy.X.Client
         /// <returns>writer instance</returns>
         public Writer Component(string component)
         {
-            _andyXOptions.Component = component;
+            _writerOptions.Component = component;
             return this;
         }
 
@@ -48,7 +49,7 @@ namespace Buildersoft.Andy.X.Client
         /// <returns>writer instance</returns>
         public Writer Book(string book)
         {
-            _andyXOptions.Book = book;
+            _writerOptions.Book = book;
             return this;
         }
 
@@ -59,7 +60,7 @@ namespace Buildersoft.Andy.X.Client
         /// <returns>writer instance</returns>
         public Writer MessageType(DataTypes dataType)
         {
-            _andyXOptions.WriterOptions.DataType = dataType;
+            _writerOptions.DataType = dataType;
             return this;
         }
 
@@ -70,7 +71,7 @@ namespace Buildersoft.Andy.X.Client
         /// <returns></returns>
         public Writer Schema(Action<SchemaOptions> schemaOptions)
         {
-            schemaOptions.Invoke(_andyXOptions.WriterOptions.Schema);
+            schemaOptions.Invoke(_writerOptions.Schema);
             return this;
         }
 
@@ -82,7 +83,7 @@ namespace Buildersoft.Andy.X.Client
         /// <returns>writer instance</returns>
         public Writer WriterType(WriterTypes writerType)
         {
-            _andyXOptions.WriterOptions.WriterType = writerType;
+            _writerOptions.WriterType = writerType;
             return this;
         }
 
@@ -94,28 +95,28 @@ namespace Buildersoft.Andy.X.Client
         public Writer Build()
         {
             string componentRequestUrl = $"{_andyXOptions.Uri}/api/v1/tenants/{_andyXOptions.Tenant}" +
-                    $"/products/{_andyXOptions.Product}/components/{_andyXOptions.Component}";
-            string bookRequestUrl = $"{componentRequestUrl}/books/{_andyXOptions.Book}";
-            string schemaRequestUrl = $"{bookRequestUrl}/schema?isSchemaValid={_andyXOptions.WriterOptions.Schema.SchemaValidationStatus}";
+                    $"/products/{_andyXOptions.Product}/components/{_writerOptions.Component}";
+            string bookRequestUrl = $"{componentRequestUrl}/books/{_writerOptions.Book}";
+            string schemaRequestUrl = $"{bookRequestUrl}/schema?isSchemaValid={_writerOptions.Schema.SchemaValidationStatus}";
 
             _ = _client.PostAsync(componentRequestUrl, null).Result;
 
-            var body = new StringContent("{}", UnicodeEncoding.UTF8, "application/json");
-            if (_andyXOptions.WriterOptions.Schema.SchemaValidationStatus == true)
-                body = new StringContent(_andyXOptions.WriterOptions.Schema.Schema, UnicodeEncoding.UTF8, "application/json");
+            var bodySchemaReq = new StringContent("{}", Encoding.UTF8, "application/json");
+            if (_writerOptions.Schema.SchemaValidationStatus == true)
+                bodySchemaReq = new StringContent(_writerOptions.Schema.Schema, Encoding.UTF8, "application/json");
 
             var response = _client.GetAsync(bookRequestUrl).Result;
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                _client.PostAsync(schemaRequestUrl, body);
+                _client.PostAsync(schemaRequestUrl, bodySchemaReq);
                 return this;
             }
 
-            response = _client.PostAsync(bookRequestUrl, body).Result;
+            response = _client.PostAsync(bookRequestUrl, bodySchemaReq).Result;
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 return this;
 
-            throw new Exception($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_andyXOptions.Component}/{_andyXOptions.Book}/writer: creation failed");
+            throw new Exception($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_writerOptions.Component}/{_writerOptions.Book}/writer: creation failed");
         }
 
         /// <summary>
@@ -139,10 +140,10 @@ namespace Buildersoft.Andy.X.Client
         /// <returns>Message id</returns>
         public async Task<Guid> WriteAsync<TEntity>(TEntity message) where TEntity : class
         {
-            if (_andyXOptions.WriterOptions.DataType == DataTypes.Json)
+            if (_writerOptions.DataType == DataTypes.Json)
             {
                 string jsonMessage = message.ObjectToJson<TEntity>();
-                string postUrl = $"{_andyXOptions.Uri}/{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_andyXOptions.Component}/{_andyXOptions.Book}";
+                string postUrl = $"{_andyXOptions.Uri}/{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_writerOptions.Component}/{_writerOptions.Book}";
 
                 var stringContent = new StringContent(jsonMessage, UnicodeEncoding.UTF8, "application/json");
 
@@ -150,12 +151,12 @@ namespace Buildersoft.Andy.X.Client
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     string responseAsString = await response.Content.ReadAsStringAsync();
-                    _logger.LogInformation($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_andyXOptions.Component}/{_andyXOptions.Book}/messages/{responseAsString.JsonToObject<Guid>()}: sent");
+                    _logger.LogInformation($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_writerOptions.Component}/{_writerOptions.Book}/messages/{responseAsString.JsonToObject<Guid>()}: sent");
 
                     return responseAsString.JsonToObject<Guid>();
                 }
             }
-            _logger.LogError($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_andyXOptions.Component}/{_andyXOptions.Book}/messages: failed");
+            _logger.LogError($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_writerOptions.Component}/{_writerOptions.Book}/messages: failed");
             return Guid.Empty;
         }
 
@@ -169,26 +170,26 @@ namespace Buildersoft.Andy.X.Client
         /// <returns>Message id</returns>
         public async Task<Guid> WriteAsync<TEntity>(string book, TEntity message, bool checkIfBookExists = true) where TEntity : class
         {
-            if (_andyXOptions.WriterOptions.DataType == DataTypes.Json)
+            if (_writerOptions.DataType == DataTypes.Json)
             {
                 if (checkIfBookExists)
                     TryToCreateWriter(book);
 
                 string jsonMessage = message.ObjectToJson<TEntity>();
 
-                string postUrl = $"{_andyXOptions.Uri}/{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_andyXOptions.Component}/{book}";
+                string postUrl = $"{_andyXOptions.Uri}/{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_writerOptions.Component}/{book}";
 
-                var stringContent = new StringContent(jsonMessage, UnicodeEncoding.UTF8, "application/json");
+                var body = new StringContent(jsonMessage, Encoding.UTF8, "application/json");
 
-                HttpResponseMessage response = _client.PostAsync(postUrl, stringContent).Result;
+                HttpResponseMessage response = _client.PostAsync(postUrl, body).Result;
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     string responseAsString = await response.Content.ReadAsStringAsync();
-                    _logger.LogInformation($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_andyXOptions.Component}/{book}/messages/{responseAsString.JsonToObject<Guid>()}: sent");
+                    _logger.LogInformation($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_writerOptions.Component}/{book}/messages/{responseAsString.JsonToObject<Guid>()}: sent");
                     return responseAsString.JsonToObject<Guid>();
                 }
             }
-            _logger.LogError($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_andyXOptions.Component}/{_andyXOptions.Book}/messages: failed");
+            _logger.LogError($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_writerOptions.Component}/{_writerOptions.Book}/messages: failed");
             return Guid.Empty;
         }
 
@@ -204,43 +205,48 @@ namespace Buildersoft.Andy.X.Client
         public async Task<Guid> WriteAsync<TEntity>(string book, Guid msgId, TEntity message, bool checkIfBookExists = true) where TEntity : class
         {
             Type typeParameterType = typeof(TEntity);
-            if (_andyXOptions.WriterOptions.DataType == DataTypes.Json)
+            if (_writerOptions.DataType == DataTypes.Json)
             {
                 if (checkIfBookExists)
                     TryToCreateWriter(book);
 
-                string jsonMessage = message.ObjectToJson<TEntity>();
+                string bodyAsJson = message.ObjectToJson<TEntity>();
 
-                string postUrl = $"{_andyXOptions.Uri}/{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_andyXOptions.Component}/{book}?msgId={msgId}";
+                string postUrl = $"{_andyXOptions.Uri}/{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_writerOptions.Component}/{book}?msgId={msgId}";
 
-                var stringContent = new StringContent(jsonMessage, UnicodeEncoding.UTF8, "application/json");
+                var body = new StringContent(bodyAsJson, UnicodeEncoding.UTF8, "application/json");
 
-                HttpResponseMessage response = await _client.PostAsync(postUrl, stringContent);
+                var response = await _client.PostAsync(postUrl, body);
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     string responseAsString = await response.Content.ReadAsStringAsync();
-                    _logger.LogInformation($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_andyXOptions.Component}/{book}/messages/{responseAsString.JsonToObject<Guid>()}: sent");
+                    _logger.LogInformation($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_writerOptions.Component}/{book}/messages/{responseAsString.JsonToObject<Guid>()}: sent");
                     return responseAsString.JsonToObject<Guid>();
                 }
             }
-            _logger.LogError($"Message failed to be written");
+            _logger.LogError($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_writerOptions.Component}/{_writerOptions.Book}/messages: failed");
+
             return Guid.Empty;
         }
 
         private Writer TryToCreateWriter(string book)
         {
             string requestUrl = $"{_andyXOptions.Uri}/api/v1/tenants/{_andyXOptions.Tenant}" +
-                    $"/products/{_andyXOptions.Product}/components/{_andyXOptions.Component}/books/{book}";
+                    $"/products/{_andyXOptions.Product}/components/{_writerOptions.Component}/books/{book}";
 
-            HttpResponseMessage response = _client.GetAsync(requestUrl).Result;
+            var response = _client.GetAsync(requestUrl).Result;
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 return this;
 
-            response = _client.PostAsync(requestUrl, null).Result;
+            var bodySchemaReq = new StringContent("{}", Encoding.UTF8, "application/json");
+            if (_writerOptions.Schema.SchemaValidationStatus == true)
+                bodySchemaReq = new StringContent(_writerOptions.Schema.Schema, Encoding.UTF8, "application/json");
+
+            response = _client.PostAsync(requestUrl, bodySchemaReq).Result;
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 return this;
 
-            throw new Exception("Can not create Writer");
+            throw new Exception($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_writerOptions.Component}/{_writerOptions.Book}/writer: creation failed");
         }
     }
 

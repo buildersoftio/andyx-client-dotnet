@@ -13,19 +13,13 @@ namespace Buildersoft.Andy.X.Client.Configurations
 
         public string Tenant { get; set; }
         public string Product { get; set; }
-        public string Component { get; set; }
-        public string Book { get; set; }
-
-        public ReaderOptions ReaderOptions { get; set; }
-        public WriterOptions WriterOptions { get; set; }
 
         public AndyXLogger Logger { get; set; }
         public HttpClientHandler HttpClientHandler { get; set; }
 
         public AndyXOptions()
         {
-            ReaderOptions = new ReaderOptions();
-            WriterOptions = new WriterOptions();
+
         }
 
         public static AndyXOptions Create(AndyXOptions andyXOptions)

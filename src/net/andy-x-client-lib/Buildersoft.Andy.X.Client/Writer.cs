@@ -14,10 +14,12 @@ namespace Buildersoft.Andy.X.Client
         private readonly HttpClient _client;
         private readonly ILogger _logger;
         private readonly AndyXOptions _andyXOptions;
+        private readonly WriterOptions _writerOptions;
 
         public Writer(AndyXClient andyClient)
         {
             _andyXOptions = AndyXOptions.Create(andyClient.GetAndyXOptions());
+            _writerOptions = new WriterOptions();
 
             _logger = _andyXOptions.Logger.GetLoggerFactory().CreateLogger<Writer<TEntity>>();
 
@@ -37,7 +39,7 @@ namespace Buildersoft.Andy.X.Client
         /// <returns>writer instance</returns>
         public Writer<TEntity> Component(string component)
         {
-            _andyXOptions.Component = component;
+            _writerOptions.Component = component;
             return this;
         }
 
@@ -48,7 +50,7 @@ namespace Buildersoft.Andy.X.Client
         /// <returns>writer instance</returns>
         public Writer<TEntity> Book(string book)
         {
-            _andyXOptions.Book = book;
+            _writerOptions.Book = book;
             return this;
         }
 
@@ -59,7 +61,7 @@ namespace Buildersoft.Andy.X.Client
         /// <returns>writer instance</returns>
         public Writer<TEntity> MessageType(DataTypes dataType)
         {
-            _andyXOptions.WriterOptions.DataType = dataType;
+            _writerOptions.DataType = dataType;
             return this;
         }
 
@@ -70,7 +72,7 @@ namespace Buildersoft.Andy.X.Client
         /// <returns></returns>
         public Writer<TEntity> Schema(Action<SchemaOptions> schemaOptions)
         {
-            schemaOptions.Invoke(_andyXOptions.WriterOptions.Schema);
+            schemaOptions.Invoke(_writerOptions.Schema);
             return this;
         }
 
@@ -82,7 +84,7 @@ namespace Buildersoft.Andy.X.Client
         /// <returns>writer instance</returns>
         public Writer<TEntity> WriterType(WriterTypes writerType)
         {
-            _andyXOptions.WriterOptions.WriterType = writerType;
+            _writerOptions.WriterType = writerType;
             return this;
         }
 
@@ -94,15 +96,15 @@ namespace Buildersoft.Andy.X.Client
         public Writer<TEntity> Build()
         {
             string componentRequestUrl = $"{_andyXOptions.Uri}/api/v1/tenants/{_andyXOptions.Tenant}" +
-                    $"/products/{_andyXOptions.Product}/components/{_andyXOptions.Component}";
-            string bookRequestUrl = $"{componentRequestUrl}/books/{_andyXOptions.Book}";
-            string schemaRequestUrl = $"{bookRequestUrl}/schema?isSchemaValid={_andyXOptions.WriterOptions.Schema.SchemaValidationStatus}";
+                    $"/products/{_andyXOptions.Product}/components/{_writerOptions.Component}";
+            string bookRequestUrl = $"{componentRequestUrl}/books/{_writerOptions.Book}";
+            string schemaRequestUrl = $"{bookRequestUrl}/schema?isSchemaValid={_writerOptions.Schema.SchemaValidationStatus}";
 
             _ = _client.PostAsync(componentRequestUrl, null).Result;
 
             var body = new StringContent("{}", UnicodeEncoding.UTF8, "application/json");
-            if (_andyXOptions.WriterOptions.Schema.SchemaValidationStatus == true)
-                body = new StringContent(_andyXOptions.WriterOptions.Schema.Schema, UnicodeEncoding.UTF8, "application/json");
+            if (_writerOptions.Schema.SchemaValidationStatus == true)
+                body = new StringContent(_writerOptions.Schema.Schema, UnicodeEncoding.UTF8, "application/json");
 
             var response = _client.GetAsync(bookRequestUrl).Result;
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
@@ -115,7 +117,7 @@ namespace Buildersoft.Andy.X.Client
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 return this;
 
-            throw new Exception($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_andyXOptions.Component}/{_andyXOptions.Book}/writer: creation failed");
+            throw new Exception($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_writerOptions.Component}/{_writerOptions.Book}/writer: creation failed");
         }
 
         /// <summary>
@@ -138,23 +140,23 @@ namespace Buildersoft.Andy.X.Client
         /// <returns>Message id</returns>
         public async Task<Guid> WriteAsync(TEntity message)
         {
-            if (_andyXOptions.WriterOptions.DataType == DataTypes.Json)
+            if (_writerOptions.DataType == DataTypes.Json)
             {
                 string jsonMessage = message.ObjectToJson<TEntity>();
-                string postUrl = $"{_andyXOptions.Uri}/{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_andyXOptions.Component}/{_andyXOptions.Book}";
+                string postUrl = $"{_andyXOptions.Uri}/{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_writerOptions.Component}/{_writerOptions.Book}";
                 var body = new StringContent(jsonMessage, UnicodeEncoding.UTF8, "application/json");
 
                 HttpResponseMessage response = await _client.PostAsync(postUrl, body);
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     string responseAsString = await response.Content.ReadAsStringAsync();
-                    _logger.LogInformation($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_andyXOptions.Component}/{_andyXOptions.Book}/messages/{responseAsString.JsonToObject<Guid>()}: sent");
+                    _logger.LogInformation($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_writerOptions.Component}/{_writerOptions.Book}/messages/{responseAsString.JsonToObject<Guid>()}: sent");
 
                     return responseAsString.JsonToObject<Guid>();
                 }
             }
 
-            _logger.LogError($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_andyXOptions.Component}/{_andyXOptions.Book}/messages: failed");
+            _logger.LogError($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_writerOptions.Component}/{_writerOptions.Book}/messages: failed");
             return Guid.Empty;
         }
 
@@ -166,22 +168,22 @@ namespace Buildersoft.Andy.X.Client
         /// <returns>Message id</returns>
         public async Task<Guid> WriteAsync(Guid msgId, TEntity message)
         {
-            if (_andyXOptions.WriterOptions.DataType == DataTypes.Json)
+            if (_writerOptions.DataType == DataTypes.Json)
             {
                 string jsonMessage = message.ObjectToJson<TEntity>();
-                string postUrl = $"{_andyXOptions.Uri}/{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_andyXOptions.Component}/{_andyXOptions.Book}?msgId={msgId}";
+                string postUrl = $"{_andyXOptions.Uri}/{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_writerOptions.Component}/{_writerOptions.Book}?msgId={msgId}";
                 var body = new StringContent(jsonMessage, UnicodeEncoding.UTF8, "application/json");
 
                 HttpResponseMessage response = await _client.PostAsync(postUrl, body);
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     string responseAsString = await response.Content.ReadAsStringAsync();
-                    _logger.LogInformation($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_andyXOptions.Component}/{_andyXOptions.Book}/messages/{responseAsString.JsonToObject<Guid>()}: sent");
+                    _logger.LogInformation($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_writerOptions.Component}/{_writerOptions.Book}/messages/{responseAsString.JsonToObject<Guid>()}: sent");
                     return responseAsString.JsonToObject<Guid>();
                 }
             }
 
-            _logger.LogError($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_andyXOptions.Component}/{_andyXOptions.Book}/messages: failed");
+            _logger.LogError($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_writerOptions.Component}/{_writerOptions.Book}/messages: failed");
             return Guid.Empty;
         }
     }

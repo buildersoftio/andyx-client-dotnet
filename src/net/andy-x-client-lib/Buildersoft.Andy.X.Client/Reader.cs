@@ -21,6 +21,7 @@ namespace Buildersoft.Andy.X.Client
 
         private readonly AndyXClient _andyXClient;
         private readonly AndyXOptions _andyXOptions;
+        private readonly ReaderOptions _readerOptions;
         private NodeReaderService nodeService;
 
         private bool isBuild;
@@ -28,6 +29,7 @@ namespace Buildersoft.Andy.X.Client
         public Reader(AndyXClient andyClient)
         {
             _andyXClient = andyClient;
+            _readerOptions = new ReaderOptions();
 
             _andyXOptions = AndyXOptions.Create(andyClient.GetAndyXOptions());
 
@@ -53,7 +55,7 @@ namespace Buildersoft.Andy.X.Client
         /// <returns>reader object</returns>
         public Reader<TEntity> Book(string book)
         {
-            _andyXOptions.Book = book;
+            _readerOptions.Book = book;
             return this;
         }
 
@@ -64,7 +66,7 @@ namespace Buildersoft.Andy.X.Client
         /// <returns>reader object</returns>
         public Reader<TEntity> Component(string component)
         {
-            _andyXOptions.Component = component;
+            _readerOptions.Component = component;
             return this;
         }
 
@@ -75,7 +77,7 @@ namespace Buildersoft.Andy.X.Client
         /// <returns>reader object</returns>
         public Reader<TEntity> ReaderName(string reader)
         {
-            _andyXOptions.ReaderOptions.Name = reader;
+            _readerOptions.Name = reader;
             return this;
         }
 
@@ -87,7 +89,7 @@ namespace Buildersoft.Andy.X.Client
         /// <returns>reader object</returns>
         public Reader<TEntity> ReaderType(ReaderTypes readerType)
         {
-            _andyXOptions.ReaderOptions.ReaderType = readerType;
+            _readerOptions.ReaderType = readerType;
             return this;
         }
 
@@ -98,7 +100,7 @@ namespace Buildersoft.Andy.X.Client
         /// <returns>reader object</returns>
         public Reader<TEntity> ReaderAs(ReaderAs readerAs)
         {
-            _andyXOptions.ReaderOptions.ReaderAs = readerAs;
+            _readerOptions.ReaderAs = readerAs;
             return this;
         }
 
@@ -116,15 +118,15 @@ namespace Buildersoft.Andy.X.Client
             nodeService.ReaderDisconnected += NodeService_ReaderDisconnected;
 
             string componentRequestUrl = $"{_andyXOptions.Uri}/api/v1/tenants/{_andyXOptions.Tenant}" +
-                    $"/products/{_andyXOptions.Product}/components/{_andyXOptions.Component}";
-            string bookRequestUrl = $"{componentRequestUrl}/books/{_andyXOptions.Book}";
-            string schemaRequestUrl = $"{bookRequestUrl}/schema?isSchemaValid={_andyXOptions.WriterOptions.Schema.SchemaValidationStatus}";
+                    $"/products/{_andyXOptions.Product}/components/{_readerOptions.Component}";
+            string bookRequestUrl = $"{componentRequestUrl}/books/{_readerOptions.Book}";
+            string schemaRequestUrl = $"{bookRequestUrl}/schema?isSchemaValid={_readerOptions.Schema.SchemaValidationStatus}";
 
             _ = _client.PostAsync(componentRequestUrl, null).Result;
 
             var body = new StringContent("{}", UnicodeEncoding.UTF8, "application/json");
-            if (_andyXOptions.ReaderOptions.Schema.SchemaValidationStatus == true)
-                body = new StringContent(_andyXOptions.ReaderOptions.Schema.Schema, UnicodeEncoding.UTF8, "application/json");
+            if (_readerOptions.Schema.SchemaValidationStatus == true)
+                body = new StringContent(_readerOptions.Schema.Schema, UnicodeEncoding.UTF8, "application/json");
 
             var response = _client.GetAsync(bookRequestUrl).Result;
             if (response.StatusCode == HttpStatusCode.OK)
@@ -178,24 +180,24 @@ namespace Buildersoft.Andy.X.Client
 
         private void NodeService_ReaderDisconnected(ReaderDisconnectedArgs obj)
         {
-            _logger.LogWarning($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_andyXOptions.Component}/{_andyXOptions.Book}/readers/{_andyXOptions.ReaderOptions.Name}/{obj.ReaderId}: disconnected");
+            _logger.LogWarning($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_readerOptions.Component}/{_readerOptions.Book}/readers/{_readerOptions.Name}/{obj.ReaderId}: disconnected");
         }
 
         private async void NodeService_MessageReceived(MessageReceivedArgs obj)
         {
-            _logger.LogInformation($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_andyXOptions.Component}/{_andyXOptions.Book}/readers/{_andyXOptions.ReaderOptions.Name}?msgId={obj.MessageId}: received");
+            _logger.LogInformation($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_readerOptions.Component}/{_readerOptions.Book}/readers/{_readerOptions.Name}?msgId={obj.MessageId}: received");
 
             // Trigger MessageReceived with message data
             MessageReceived?.Invoke(this, new MessageEventArgs(obj.Message.ToString().TryJsonToObject<TEntity>()));
             
-            _logger.LogInformation($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_andyXOptions.Component}/{_andyXOptions.Book}/readers/{_andyXOptions.ReaderOptions.Name}?msgId={obj.MessageId}: processed");
+            _logger.LogInformation($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_readerOptions.Component}/{_readerOptions.Book}/readers/{_readerOptions.Name}?msgId={obj.MessageId}: processed");
 
             await AcknowledgeThisMessage(obj);
         }
 
         private void NodeService_ReaderConnected(ReaderConnectedArgs obj)
         {
-            _logger.LogInformation($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_andyXOptions.Component}/{_andyXOptions.Book}/readers/{_andyXOptions.ReaderOptions.Name}/{obj.ReaderId}: connected");
+            _logger.LogInformation($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_readerOptions.Component}/{_readerOptions.Book}/readers/{_readerOptions.Name}/{obj.ReaderId}: connected");
         }
 
         private async Task AcknowledgeThisMessage(MessageReceivedArgs obj)
@@ -203,13 +205,13 @@ namespace Buildersoft.Andy.X.Client
             await nodeService.AcknowledgeMessage(new MessageAckDetail()
             {
                 MessageId = obj.MessageId,
-                Reader = _andyXOptions.ReaderOptions.Name,
+                Reader = _readerOptions.Name,
                 Book = obj.Book,
                 Component = obj.Component,
                 Product = obj.Product,
                 Tenant = obj.Tenant
             });
-            _logger.LogInformation($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_andyXOptions.Component}/{_andyXOptions.Book}/readers/{_andyXOptions.ReaderOptions.Name}?msgId={obj.MessageId}: acknowledged");
+            _logger.LogInformation($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_readerOptions.Component}/{_readerOptions.Book}/readers/{_readerOptions.Name}?msgId={obj.MessageId}: acknowledged");
         }
     }
 }

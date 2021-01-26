@@ -6,6 +6,9 @@ namespace Buildersoft.Andy.X.Client.Configurations
 {
     public class ReaderOptions
     {
+        public string Component { get; set; }
+        public string Book { get; set; }
+
         public string Name { get; set; }
         public ReaderTypes ReaderType { get; set; }
         public ReaderAs ReaderAs { get; set; }
