@@ -17,7 +17,7 @@ namespace Buildersoft.Andy.X.Client
             {
                 _andyXClient = andyXClient;
 
-                var clientOptions = andyXClient.GetAndyXOptions();
+                var clientOptions = andyXClient.GetOptions();
 
                 _connection = new HubConnectionBuilder()
                     .WithUrl($"{clientOptions.Uri}/realtime/v1/reader", option =>

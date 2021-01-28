@@ -18,7 +18,7 @@ namespace Buildersoft.Andy.X.Client
 
         public Writer(AndyXClient andyClient)
         {
-            _andyXOptions = AndyXOptions.Create(andyClient.GetAndyXOptions());
+            _andyXOptions = AndyXOptions.Create(andyClient.GetOptions());
 
             _logger = _andyXOptions.Logger.GetLoggerFactory().CreateLogger<Writer>();
 

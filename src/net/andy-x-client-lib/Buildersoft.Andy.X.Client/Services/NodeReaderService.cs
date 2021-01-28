@@ -23,7 +23,7 @@ namespace Buildersoft.Andy.X.Client
             {
                 _logger = nodeProvider
                     .GetAndyXClient()
-                    .GetAndyXOptions()
+                    .GetOptions()
                     .Logger
                     .GetLoggerFactory()
                     .CreateLogger<NodeReaderService>();

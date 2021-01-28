@@ -31,7 +31,7 @@ namespace Buildersoft.Andy.X.Client
             _andyXClient = andyClient;
             _readerOptions = new ReaderOptions();
 
-            _andyXOptions = AndyXOptions.Create(andyClient.GetAndyXOptions());
+            _andyXOptions = AndyXOptions.Create(andyClient.GetOptions());
 
             _logger = _andyXOptions
                 .Logger
