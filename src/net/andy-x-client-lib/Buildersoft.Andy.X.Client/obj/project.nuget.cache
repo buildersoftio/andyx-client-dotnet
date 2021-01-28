@@ -1,10 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "gwUR/c8+2731Yz+ZUgr0Qu2Pt9+B5Kgpmocale3XZmukYX/lnJ1BuIUWNYkOEREuloWDEjml7Om9nTe1Hzh2eA==",
+  "dgSpecHash": "SFjsTCgwI/aNXhvDTQuS675dSipU6vFduQbwkzX939iR5ue53dPjWRUvzltZGhyh1HKJPudL/jZWiVCOosWywg==",
   "success": true,
   "projectFilePath": "C:\\Users\\enesh\\source\\repos\\andyxclient-github\\src\\net\\andy-x-client-lib\\Buildersoft.Andy.X.Client\\Buildersoft.Andy.X.Client.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\enesh\\.nuget\\packages\\microsoft.aspnetcore.connections.abstractions\\5.0.1\\microsoft.aspnetcore.connections.abstractions.5.0.1.nupkg.sha512",
+    "C:\\Users\\enesh\\.nuget\\packages\\microsoft.aspnetcore.http.abstractions\\2.2.0\\microsoft.aspnetcore.http.abstractions.2.2.0.nupkg.sha512",
     "C:\\Users\\enesh\\.nuget\\packages\\microsoft.aspnetcore.http.connections.client\\5.0.1\\microsoft.aspnetcore.http.connections.client.5.0.1.nupkg.sha512",
     "C:\\Users\\enesh\\.nuget\\packages\\microsoft.aspnetcore.http.connections.common\\5.0.1\\microsoft.aspnetcore.http.connections.common.5.0.1.nupkg.sha512",
     "C:\\Users\\enesh\\.nuget\\packages\\microsoft.aspnetcore.http.features\\5.0.1\\microsoft.aspnetcore.http.features.5.0.1.nupkg.sha512",
@@ -64,6 +65,7 @@
     "C:\\Users\\enesh\\.nuget\\packages\\system.runtime.serialization.primitives\\4.1.1\\system.runtime.serialization.primitives.4.1.1.nupkg.sha512",
     "C:\\Users\\enesh\\.nuget\\packages\\system.text.encoding\\4.3.0\\system.text.encoding.4.3.0.nupkg.sha512",
     "C:\\Users\\enesh\\.nuget\\packages\\system.text.encoding.extensions\\4.0.11\\system.text.encoding.extensions.4.0.11.nupkg.sha512",
+    "C:\\Users\\enesh\\.nuget\\packages\\system.text.encodings.web\\4.5.0\\system.text.encodings.web.4.5.0.nupkg.sha512",
     "C:\\Users\\enesh\\.nuget\\packages\\system.text.encodings.web\\5.0.0\\system.text.encodings.web.5.0.0.nupkg.sha512",
     "C:\\Users\\enesh\\.nuget\\packages\\system.text.json\\5.0.0\\system.text.json.5.0.0.nupkg.sha512",
     "C:\\Users\\enesh\\.nuget\\packages\\system.text.regularexpressions\\4.1.0\\system.text.regularexpressions.4.1.0.nupkg.sha512",

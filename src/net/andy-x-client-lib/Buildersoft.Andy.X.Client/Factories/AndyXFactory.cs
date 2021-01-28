@@ -1,4 +1,5 @@
-﻿using Buildersoft.Andy.X.Client.Builders;
+﻿using Buildersoft.Andy.X.Client.Abstraction;
+using Buildersoft.Andy.X.Client.Builders;
 using Buildersoft.Andy.X.Client.Configurations;
 using Buildersoft.Andy.X.Client.Configurations.Logging;
 using Microsoft.Extensions.Logging;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Buildersoft.Andy.X.Client.Factories
 {
-    public class AndyXFactory : AndyXBuilder
+    public class AndyXFactory : AndyXBuilder, IAndyXFactory
     {
         public AndyXFactory() : base()
         {
@@ -24,7 +25,7 @@ namespace Buildersoft.Andy.X.Client.Factories
         /// <param name="url">url of andy x node</param>
         public AndyXFactory(string url) : base(url)
         {
-            
+
         }
 
         private AndyXFactory(AndyXOptions andyXOptions, HttpClient client, ILogger logger)
@@ -38,7 +39,7 @@ namespace Buildersoft.Andy.X.Client.Factories
         /// Build Andy X Client
         /// </summary>
         /// <returns>If true client can reach Andy X, if false check parameters in andyxoptions</returns>
-        public async Task<AndyXFactory> BuildAsync()
+        public async Task<IAndyXFactory> BuildAsync()
         {
             _client = new HttpClient(_andyXOptions.HttpClientHandler);
 
@@ -79,9 +80,9 @@ namespace Buildersoft.Andy.X.Client.Factories
         /// Get Andy X Client
         /// </summary>
         /// <returns>AndyXClient object</returns>
-        public AndyXFactory CreateClient()
+        public AndyXClient CreateClient()
         {
-            return new AndyXFactory(_andyXOptions, _client, _logger);
+            return new AndyXFactory(_andyXOptions, _client, _logger) as AndyXClient;
         }
     }
 }
