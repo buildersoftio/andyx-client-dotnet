@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Buildersoft.Andy.X.Client
 {
-    public class Writer<TEntity> : BaseWriter where TEntity : class
+    public class Writer<TEntity> : WriterBase where TEntity : class
     {
         public Writer(AndyXClient andyClient) : base(andyClient, typeof(Writer<TEntity>))
         {

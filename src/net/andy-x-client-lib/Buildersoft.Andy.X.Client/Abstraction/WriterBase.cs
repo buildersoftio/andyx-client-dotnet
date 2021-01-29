@@ -9,14 +9,14 @@ using System.Threading.Tasks;
 
 namespace Buildersoft.Andy.X.Client.Abstraction
 {
-    public abstract class BaseWriter
+    public abstract class WriterBase
     {
         public readonly HttpClient _client;
         public readonly ILogger _logger;
         public readonly AndyXOptions _andyXOptions;
         public readonly WriterOptions _writerOptions;
 
-        public BaseWriter(AndyXClient andyClient, Type type)
+        public WriterBase(AndyXClient andyClient, Type type)
         {
             _andyXOptions = AndyXOptions.Create(andyClient.GetOptions());
             _writerOptions = new WriterOptions();
@@ -36,7 +36,7 @@ namespace Buildersoft.Andy.X.Client.Abstraction
         /// </summary>
         /// <param name="component">component name</param>
         /// <returns>writer instance</returns>
-        public BaseWriter Component(string component)
+        public WriterBase Component(string component)
         {
             _writerOptions.Component = component;
             return this;
@@ -47,7 +47,7 @@ namespace Buildersoft.Andy.X.Client.Abstraction
         /// </summary>
         /// <param name="book">book name</param>
         /// <returns>writer instance</returns>
-        public BaseWriter Book(string book)
+        public WriterBase Book(string book)
         {
             _writerOptions.Book = book;
             return this;
@@ -58,7 +58,7 @@ namespace Buildersoft.Andy.X.Client.Abstraction
         /// </summary>
         /// <param name="dataType">DataTypes enum</param>
         /// <returns>writer instance</returns>
-        public BaseWriter MessageType(DataTypes dataType)
+        public WriterBase MessageType(DataTypes dataType)
         {
             _writerOptions.DataType = dataType;
             return this;
@@ -69,7 +69,7 @@ namespace Buildersoft.Andy.X.Client.Abstraction
         /// </summary>
         /// <param name="schemaOptions">Action type SchemaOptions</param>
         /// <returns></returns>
-        public BaseWriter Schema(Action<SchemaOptions> schemaOptions)
+        public WriterBase Schema(Action<SchemaOptions> schemaOptions)
         {
             schemaOptions.Invoke(_writerOptions.Schema);
             return this;
@@ -81,7 +81,7 @@ namespace Buildersoft.Andy.X.Client.Abstraction
         /// </summary>
         /// <param name="writerType">Writer type enum</param>
         /// <returns>writer instance</returns>
-        public BaseWriter WriterType(WriterTypes writerType)
+        public WriterBase WriterType(WriterTypes writerType)
         {
             _writerOptions.WriterType = writerType;
             return this;
@@ -92,7 +92,7 @@ namespace Buildersoft.Andy.X.Client.Abstraction
         /// This function will create component and book if they do not exists
         /// </summary>
         /// <returns>writer instance</returns>
-        public BaseWriter Build()
+        public WriterBase Build()
         {
             string componentEndpoint = $"{_andyXOptions.Uri}/api/v1/tenants/{_andyXOptions.Tenant}" +
                     $"/products/{_andyXOptions.Product}/components/{_writerOptions.Component}";
@@ -124,9 +124,9 @@ namespace Buildersoft.Andy.X.Client.Abstraction
         /// This function will create component and book if they do not exists
         /// </summary>
         /// <returns>Task of writer instance</returns>
-        public Task<BaseWriter> BuildAsync()
+        public Task<WriterBase> BuildAsync()
         {
-            return new Task<BaseWriter>(() =>
+            return new Task<WriterBase>(() =>
             {
                 return Build();
             });

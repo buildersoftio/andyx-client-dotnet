@@ -52,7 +52,7 @@ namespace Buildersoft.Andy.X.Client.Extensions.DependencyInjection
             {
                 throw new Exception("Please add AndyX into ServiceCollection");
             }
-            await (service as AndyXFactory).BuildAsync();
+            await (service as AndyXClient).BuildAsync();
         }
     }
 }

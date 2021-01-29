@@ -23,6 +23,13 @@ namespace Buildersoft.Andy.X.Client.Builders
             InitializeLogger();
         }
 
+        private AndyXBuilder(AndyXOptions andyXOptions, HttpClient client, ILogger logger)
+        {
+            _andyXOptions = andyXOptions;
+            _client = client;
+            _logger = logger;
+        }
+
         /// <summary>
         /// Initialize new instance of Andy X Client
         /// </summary>
@@ -111,6 +118,11 @@ namespace Buildersoft.Andy.X.Client.Builders
         {
             _andyXOptions.HttpClientHandler = httpClientHandler;
             return this;
+        }
+
+        protected AndyXBuilder InitializeBuilder()
+        {
+            return new AndyXBuilder(_andyXOptions, _client, _logger);
         }
 
 

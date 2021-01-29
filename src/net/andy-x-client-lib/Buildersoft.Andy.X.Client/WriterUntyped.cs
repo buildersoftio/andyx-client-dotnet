@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Buildersoft.Andy.X.Client
 {
-    public class Writer : BaseWriter
+    public class Writer : WriterBase
     {
         public Writer(AndyXClient andyClient) : base(andyClient, typeof(Writer))
         {
@@ -29,7 +29,7 @@ namespace Buildersoft.Andy.X.Client
                 string jsonMessage = message.ObjectToJson<TEntity>();
                 string postUrl = $"{_andyXOptions.Uri}/{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_writerOptions.Component}/{_writerOptions.Book}";
 
-                var stringContent = new StringContent(jsonMessage, UnicodeEncoding.UTF8, "application/json");
+                var stringContent = new StringContent(jsonMessage, Encoding.UTF8, "application/json");
 
                 HttpResponseMessage response = _client.PostAsync(postUrl, stringContent).Result;
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
@@ -97,7 +97,7 @@ namespace Buildersoft.Andy.X.Client
                 string messageEndpointPath = $"{_andyXOptions.Uri}/{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_writerOptions.Component}/{book}?msgId={msgId}";
                 string bodyRaw = message.ObjectToJson<TEntity>();
 
-                var body = new StringContent(bodyRaw, UnicodeEncoding.UTF8, "application/json");
+                var body = new StringContent(bodyRaw, Encoding.UTF8, "application/json");
 
                 var response = await _client.PostAsync(messageEndpointPath, body);
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
