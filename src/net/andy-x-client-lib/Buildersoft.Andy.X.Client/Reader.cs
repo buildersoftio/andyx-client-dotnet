@@ -111,7 +111,7 @@ namespace Buildersoft.Andy.X.Client
         /// <returns>reader object</returns>
         public Reader<TEntity> Build()
         {
-            nodeService = new NodeReaderService(new NodeProvider(_andyXClient));
+            nodeService = new NodeReaderService(new NodeProvider(_andyXClient, _readerOptions));
 
             nodeService.ReaderConnected += NodeService_ReaderConnected;
             nodeService.MessageReceived += NodeService_MessageReceived;
@@ -124,9 +124,9 @@ namespace Buildersoft.Andy.X.Client
 
             _ = _client.PostAsync(componentRequestUrl, null).Result;
 
-            var body = new StringContent("{}", UnicodeEncoding.UTF8, "application/json");
+            var body = new StringContent("{}", Encoding.UTF8, "application/json");
             if (_readerOptions.Schema.SchemaValidationStatus == true)
-                body = new StringContent(_readerOptions.Schema.Schema, UnicodeEncoding.UTF8, "application/json");
+                body = new StringContent(_readerOptions.Schema.Schema, Encoding.UTF8, "application/json");
 
             var response = _client.GetAsync(bookRequestUrl).Result;
             if (response.StatusCode == HttpStatusCode.OK)
@@ -161,10 +161,13 @@ namespace Buildersoft.Andy.X.Client
         /// Connect and start receiving messages
         /// </summary>
         /// <returns></returns>
-        public async Task StartReadingAsync()
+        public async Task ConnectAsync()
         {
             if (isBuild == true)
                 await nodeService.ConnectAsync();
+
+            else
+                throw new Exception($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_readerOptions.Component}/{_readerOptions.Book}/readers/{_readerOptions.Name}: build-failed");
         }
 
         /// <summary>
@@ -172,7 +175,7 @@ namespace Buildersoft.Andy.X.Client
         /// </summary>
         /// <param name="reason">reason - string</param>
         /// <returns></returns>
-        public async Task StopReading(string reason)
+        public async Task DisconnectAsync(string reason)
         {
             if (isBuild == true)
                 await nodeService.CloseConnectionAsync();
@@ -189,7 +192,7 @@ namespace Buildersoft.Andy.X.Client
 
             // Trigger MessageReceived with message data
             MessageReceived?.Invoke(this, new MessageEventArgs(obj.Message.ToString().TryJsonToObject<TEntity>()));
-            
+
             _logger.LogInformation($"andyx-persistent://{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_readerOptions.Component}/{_readerOptions.Book}/readers/{_readerOptions.Name}?msgId={obj.MessageId}: processed");
 
             await AcknowledgeThisMessage(obj);

@@ -1,12 +1,9 @@
 ﻿using Buildersoft.Andy.X.Client.Configurations;
 using Buildersoft.Andy.X.Client.Configurations.Logging;
+using Buildersoft.Andy.X.Client.Events;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Buildersoft.Andy.X.Client.Builders
 {
@@ -15,6 +12,7 @@ namespace Buildersoft.Andy.X.Client.Builders
         protected AndyXOptions _andyXOptions;
         protected HttpClient _client;
         protected ILogger _logger;
+        public AndyXEvents Events { get; set; }
 
         /// <summary>
         /// Initialize new instance of Andy X Client
@@ -132,5 +130,10 @@ namespace Buildersoft.Andy.X.Client.Builders
                 .GetLoggerFactory()
                 .CreateLogger<AndyXClient>();
         }
+    }
+
+    public class AndyXEvents
+    {
+        public Action<StateChangedContext> OnStateChanged { get; set; }
     }
 }

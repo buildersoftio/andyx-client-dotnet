@@ -12,10 +12,12 @@ namespace Buildersoft.Andy.X.Client
         {
             private readonly HubConnection _connection;
             private readonly AndyXClient _andyXClient;
+            private readonly ReaderOptions _readerOptions;
 
-            public NodeProvider(AndyXClient andyXClient)
+            public NodeProvider(AndyXClient andyXClient, ReaderOptions readerOptions)
             {
                 _andyXClient = andyXClient;
+                _readerOptions = readerOptions;
 
                 var clientOptions = andyXClient.GetOptions();
 
@@ -27,11 +29,11 @@ namespace Buildersoft.Andy.X.Client
 
                         option.Headers["x-andy-x-tenant"] = clientOptions.Tenant;
                         option.Headers["x-andy-x-product"] = clientOptions.Product;
-                        option.Headers["x-andy-x-component"] = clientOptions.Component;
-                        option.Headers["x-andy-x-book"] = clientOptions.Book;
-                        option.Headers["x-andy-x-reader"] = clientOptions.ReaderOptions.Name;
-                        option.Headers["x-andy-x-readertype"] = clientOptions.ReaderOptions.ReaderType.ToString();
-                        option.Headers["x-andy-x-readeras"] = clientOptions.ReaderOptions.ReaderAs.ToString();
+                        option.Headers["x-andy-x-component"] = _readerOptions.Component;
+                        option.Headers["x-andy-x-book"] = _readerOptions.Book;
+                        option.Headers["x-andy-x-reader"] = _readerOptions.Name;
+                        option.Headers["x-andy-x-readertype"] = _readerOptions.ReaderType.ToString();
+                        option.Headers["x-andy-x-readeras"] = _readerOptions.ReaderAs.ToString();
                     })
                     .WithAutomaticReconnect()
                     .Build();
@@ -53,6 +55,15 @@ namespace Buildersoft.Andy.X.Client
             public AndyXClient GetAndyXClient()
             {
                 return _andyXClient;
+            }
+
+            /// <summary>
+            /// Get ReaderOptions
+            /// </summary>
+            /// <returns>ReaderOptions connected to node</returns>
+            public ReaderOptions GetReaderOptions()
+            {
+                return _readerOptions;
             }
         }
     }

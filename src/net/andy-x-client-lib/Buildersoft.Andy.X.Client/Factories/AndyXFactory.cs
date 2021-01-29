@@ -2,6 +2,7 @@
 using Buildersoft.Andy.X.Client.Builders;
 using Buildersoft.Andy.X.Client.Configurations;
 using Buildersoft.Andy.X.Client.Configurations.Logging;
+using Buildersoft.Andy.X.Client.Events;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -47,11 +48,15 @@ namespace Buildersoft.Andy.X.Client.Factories
             {
                 _logger.LogError($"andyx-persistent://errors/description: Token is not provided");
                 _andyXOptions.State = ConnectionStates.Failed;
+
+                Events.OnStateChanged?.Invoke(new StateChangedContext(_andyXOptions.State));
             }
             if (_andyXOptions.Tenant == "")
             {
                 _logger.LogError($"andyx-persistent://errors/description: Tenant is not provided");
                 _andyXOptions.State = ConnectionStates.Failed;
+
+                Events.OnStateChanged?.Invoke(new StateChangedContext(_andyXOptions.State));
             }
 
             _client.DefaultRequestHeaders.Add("x-andy-x-tenant-Authorization", $"Bearer {_andyXOptions.Token}");
@@ -65,12 +70,16 @@ namespace Buildersoft.Andy.X.Client.Factories
                 {
                     _logger.LogInformation($"andyx-persistent://{_andyXOptions.Tenant}: connected");
                     _andyXOptions.State = ConnectionStates.Connected;
+
+                    Events.OnStateChanged?.Invoke(new StateChangedContext(_andyXOptions.State));
                 }
             }
             catch (Exception e)
             {
                 _logger.LogError($"andyx-persistent://{_andyXOptions.Tenant}/errors/details: {e.Message}");
                 _andyXOptions.State = ConnectionStates.Failed;
+
+                Events.OnStateChanged?.Invoke(new StateChangedContext(_andyXOptions.State));
             }
 
             return this;
