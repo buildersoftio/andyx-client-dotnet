@@ -16,7 +16,8 @@ namespace Buildersoft.Andy.X.Client.Extensions
                 IgnoreReadOnlyProperties = true,
             });
         }
-        public static string ObjectToJson<TClass>(this object obj) where TClass : class
+
+        public static string ObjectToJson<TClass>(this object obj)
         {
             return JsonSerializer.Serialize(obj, typeof(TClass), new JsonSerializerOptions()
             {
@@ -25,7 +26,7 @@ namespace Buildersoft.Andy.X.Client.Extensions
             });
         }
 
-        public static string TryObjectToJson<TClass>(this object obj) where TClass : class
+        public static string TryObjectToJson<TClass>(this object obj)
         {
             try
             {
@@ -39,10 +40,9 @@ namespace Buildersoft.Andy.X.Client.Extensions
             {
                 return "{}";
             }
-
         }
 
-        public static TClass JsonToObject<TClass>(this string jsonMessage) where TClass : new()
+        public static TClass JsonToObject<TClass>(this string jsonMessage)
         {
             return (TClass)(JsonSerializer.Deserialize(jsonMessage, typeof(TClass), new JsonSerializerOptions()
             {
@@ -60,7 +60,7 @@ namespace Buildersoft.Andy.X.Client.Extensions
             }));
         }
 
-        public static TClass TryJsonToObject<TClass>(this string jsonMessage) where TClass : new()
+        public static TClass TryJsonToObject<TClass>(this string jsonMessage)
         {
             try
             {
@@ -72,7 +72,7 @@ namespace Buildersoft.Andy.X.Client.Extensions
             }
             catch (Exception)
             {
-                return new TClass();
+                return default;
             }
         }
     }

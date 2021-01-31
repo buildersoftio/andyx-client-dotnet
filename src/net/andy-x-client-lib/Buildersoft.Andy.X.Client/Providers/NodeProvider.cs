@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Buildersoft.Andy.X.Client
 {
-    public partial class Reader<TEntity> where TEntity : new()
+    public partial class Reader<TEntity>
     {
         private class NodeProvider
         {
