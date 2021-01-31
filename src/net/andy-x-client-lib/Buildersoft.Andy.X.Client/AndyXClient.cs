@@ -37,6 +37,15 @@ namespace Buildersoft.Andy.X.Client
         /// Build Andy X Client
         /// </summary>
         /// <returns>If true client can reach Andy X, if false check parameters in andyxoptions</returns>
+        public AndyXClient Build()
+        {
+            return BuildAsync().Result;
+        }
+
+        /// <summary>
+        /// Build Andy X Client Asynchronously
+        /// </summary>
+        /// <returns>If true client can reach Andy X, if false check parameters in andyxoptions</returns>
         public async Task<AndyXClient> BuildAsync()
         {
             _client = new HttpClient(_andyXOptions.HttpClientHandler);

@@ -88,31 +88,31 @@ namespace Buildersoft.Andy.X.Client.Abstraction
         }
 
         /// <summary>
-        /// Build Writer.
+        /// Build Writer Asynchronously
         /// This function will create component and book if they do not exists
         /// </summary>
         /// <returns>writer instance</returns>
-        public WriterBase Build()
+        public async Task<WriterBase> BuildAsync()
         {
             string componentEndpoint = $"{_andyXOptions.Uri}/api/v1/tenants/{_andyXOptions.Tenant}" +
                     $"/products/{_andyXOptions.Product}/components/{_writerOptions.Component}";
             string bookEndpoint = $"{componentEndpoint}/books/{_writerOptions.Book}";
             string schemaEndpoint = $"{bookEndpoint}/schema?isSchemaValid={_writerOptions.Schema.SchemaValidationStatus}";
 
-            _ = _client.PostAsync(componentEndpoint, null).Result;
+            await _client.PostAsync(componentEndpoint, null);
 
             var bodyRequest = new StringContent("{}", Encoding.UTF8, "application/json");
             if (_writerOptions.Schema.SchemaValidationStatus == true)
                 bodyRequest = new StringContent(_writerOptions.Schema.Schema, Encoding.UTF8, "application/json");
 
-            var response = _client.GetAsync(bookEndpoint).Result;
+            var response = await _client.GetAsync(bookEndpoint);
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                _client.PostAsync(schemaEndpoint, bodyRequest);
+                await _client.PostAsync(schemaEndpoint, bodyRequest);
                 return this;
             }
 
-            response = _client.PostAsync(bookEndpoint, bodyRequest).Result;
+            response = await _client.PostAsync(bookEndpoint, bodyRequest);
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 return this;
 
@@ -120,16 +120,13 @@ namespace Buildersoft.Andy.X.Client.Abstraction
         }
 
         /// <summary>
-        /// Build Writer asynchronously.
+        /// Build Writer
         /// This function will create component and book if they do not exists
         /// </summary>
         /// <returns>Task of writer instance</returns>
-        public Task<WriterBase> BuildAsync()
+        public WriterBase Build()
         {
-            return new Task<WriterBase>(() =>
-            {
-                return Build();
-            });
+            return BuildAsync().Result;
         }
     }
 }

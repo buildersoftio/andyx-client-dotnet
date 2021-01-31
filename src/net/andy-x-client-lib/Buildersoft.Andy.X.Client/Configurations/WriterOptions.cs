@@ -14,6 +14,13 @@ namespace Buildersoft.Andy.X.Client.Configurations
         public DataTypes DataType { get; set; }
         public SchemaOptions Schema { get; set; }
 
+        public WriterOptions()
+        {
+            Schema = new SchemaOptions();
+
+            WriterType = WriterTypes.StreamAndStore;
+            DataType = DataTypes.Json;
+        }
     }
 
     public enum WriterTypes

@@ -17,7 +17,7 @@ namespace Buildersoft.Andy.X.Client.Configurations
             SchemaValidationStatus = false;
         }
 
-        public void SetSchema<T>() where T : class
+        public void SetSchema<T>()
         {
             Schema = JsonSchema.FromType<T>().ToJson();
         }

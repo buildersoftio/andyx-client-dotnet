@@ -20,14 +20,8 @@ namespace Buildersoft.Andy.X.Client.Builders
         public AndyXBuilder()
         {
             _andyXOptions = new AndyXOptions() { Logger = new AndyXLogger(), HttpClientHandler = new HttpClientHandler() };
+            Events = new AndyXEvents();
             InitializeLogger();
-        }
-
-        private AndyXBuilder(AndyXOptions andyXOptions, HttpClient client, ILogger logger)
-        {
-            _andyXOptions = andyXOptions;
-            _client = client;
-            _logger = logger;
         }
 
         /// <summary>
@@ -38,6 +32,7 @@ namespace Buildersoft.Andy.X.Client.Builders
         public AndyXBuilder(string url)
         {
             _andyXOptions = new AndyXOptions() { Uri = url, Logger = new AndyXLogger(), HttpClientHandler = new HttpClientHandler() };
+            Events = new AndyXEvents();
             InitializeLogger();
         }
 
@@ -50,7 +45,15 @@ namespace Buildersoft.Andy.X.Client.Builders
         public AndyXBuilder(string url, ILoggerFactory factory)
         {
             _andyXOptions = new AndyXOptions() { Uri = url, Logger = new AndyXLogger(factory), HttpClientHandler = new HttpClientHandler() };
+            Events = new AndyXEvents();
             InitializeLogger();
+        }
+
+        private AndyXBuilder(AndyXOptions andyXOptions, HttpClient client, ILogger logger)
+        {
+            _andyXOptions = andyXOptions;
+            _client = client;
+            _logger = logger;
         }
 
         /// <summary>

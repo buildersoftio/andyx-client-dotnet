@@ -13,6 +13,14 @@ namespace Buildersoft.Andy.X.Client.Configurations
         public ReaderTypes ReaderType { get; set; }
         public ReaderAs ReaderAs { get; set; }
         public SchemaOptions Schema { get; set; }
+
+        public ReaderOptions()
+        {
+            Schema = new SchemaOptions();
+
+            ReaderType = ReaderTypes.Exclusive;
+            ReaderAs = ReaderAs.Subscription;
+        }
     }
 
     public enum ReaderTypes

@@ -105,11 +105,23 @@ namespace Buildersoft.Andy.X.Client
         }
 
         /// <summary>
-        /// Build Reader.
+        /// Configure schema for accepting messages in book.
+        /// </summary>
+        /// <param name="schemaOptions">Action type SchemaOptions</param>
+        /// <returns></returns>
+        public Reader<TEntity> Schema(Action<SchemaOptions> schemaOptions)
+        {
+            schemaOptions.Invoke(_readerOptions.Schema);
+            return this;
+        }
+
+
+        /// <summary>
+        /// Build Reader asynchronously
         /// This function will create component and book if they do not exists
         /// </summary>
-        /// <returns>reader object</returns>
-        public Reader<TEntity> Build()
+        /// <returns>Task type reader object</returns>
+        public async Task<Reader<TEntity>> BuildAsync()
         {
             nodeService = new NodeReaderService(new NodeProvider(_andyXClient, _readerOptions));
 
@@ -122,21 +134,21 @@ namespace Buildersoft.Andy.X.Client
             string bookRequestUrl = $"{componentRequestUrl}/books/{_readerOptions.Book}";
             string schemaRequestUrl = $"{bookRequestUrl}/schema?isSchemaValid={_readerOptions.Schema.SchemaValidationStatus}";
 
-            _ = _client.PostAsync(componentRequestUrl, null).Result;
+            await _client.PostAsync(componentRequestUrl, null);
 
             var body = new StringContent("{}", Encoding.UTF8, "application/json");
             if (_readerOptions.Schema.SchemaValidationStatus == true)
                 body = new StringContent(_readerOptions.Schema.Schema, Encoding.UTF8, "application/json");
 
-            var response = _client.GetAsync(bookRequestUrl).Result;
+            var response = await _client.GetAsync(bookRequestUrl);
             if (response.StatusCode == HttpStatusCode.OK)
             {
-                _client.PostAsync(schemaRequestUrl, body);
+                await _client.PostAsync(schemaRequestUrl, body);
                 isBuild = true;
             }
             else
             {
-                response = _client.PostAsync(bookRequestUrl, body).Result;
+                response = await _client.PostAsync(bookRequestUrl, body);
                 if (response.StatusCode == HttpStatusCode.OK)
                     isBuild = true;
             }
@@ -145,16 +157,13 @@ namespace Buildersoft.Andy.X.Client
         }
 
         /// <summary>
-        /// Build Reader asynchronously.
+        /// Build Reader
         /// This function will create component and book if they do not exists
         /// </summary>
         /// <returns>Task of reader instance</returns>
-        public Task<Reader<TEntity>> BuildAsync()
+        public Reader<TEntity> Build()
         {
-            return new Task<Reader<TEntity>>(() =>
-            {
-                return Build();
-            });
+            return BuildAsync().Result;
         }
 
         /// <summary>
