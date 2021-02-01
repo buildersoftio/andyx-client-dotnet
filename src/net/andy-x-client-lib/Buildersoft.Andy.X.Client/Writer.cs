@@ -13,6 +13,7 @@ namespace Buildersoft.Andy.X.Client
     {
         public Writer(AndyXClient andyClient) : base(andyClient, typeof(Writer<T>))
         {
+
         }
 
         /// <summary>

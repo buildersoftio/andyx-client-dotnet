@@ -17,12 +17,12 @@ namespace Buildersoft.Andy.X.Client.Abstraction
         public delegate void OnMessageReceivedHandler(object sender, MessageEventArgs e);
         public event OnMessageReceivedHandler MessageReceived;
 
-        private readonly HttpClient _client;
-        private readonly ILogger _logger;
+        protected readonly HttpClient _client;
+        protected readonly ILogger _logger;
 
-        private readonly AndyXClient _andyXClient;
-        private readonly AndyXOptions _andyXOptions;
-        private readonly ReaderOptions _readerOptions;
+        protected readonly AndyXClient _andyXClient;
+        protected readonly AndyXOptions _andyXOptions;
+        protected readonly ReaderOptions _readerOptions;
         private NodeReaderService nodeService;
 
         private readonly Type _type;
@@ -52,6 +52,32 @@ namespace Buildersoft.Andy.X.Client.Abstraction
 
             isBuild = false;
         }
+
+        public ReaderBase(AndyXClient andyXClient, Type type, Action<ReaderOptions> readerOptionsAction)
+        {
+            _type = type;
+
+            _andyXClient = andyXClient;
+            _readerOptions = new ReaderOptions();
+            readerOptionsAction?.Invoke(_readerOptions);
+
+            _andyXOptions = AndyXOptions.Create(andyXClient.GetOptions());
+
+            _logger = _andyXOptions
+                .Logger
+                .GetLoggerFactory()
+                .CreateLogger(_type);
+
+            _client = new HttpClient(_andyXOptions.HttpClientHandler);
+            if (_andyXOptions.Token != "")
+                _client.DefaultRequestHeaders.Add("x-andy-x-tenant-Authorization", $"Bearer {_andyXOptions.Token}");
+
+            if (_andyXOptions.Tenant != "")
+                _client.DefaultRequestHeaders.Add("x-andy-x-tenant", _andyXOptions.Tenant);
+
+            isBuild = false;
+        }
+
 
 
         /// <summary>
