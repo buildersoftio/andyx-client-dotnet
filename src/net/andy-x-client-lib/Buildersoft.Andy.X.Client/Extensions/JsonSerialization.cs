@@ -60,6 +60,23 @@ namespace Buildersoft.Andy.X.Client.Extensions
             }));
         }
 
+        public static dynamic TryJsonToDynamic(this string jsonMessage, Type type)
+        {
+            try
+            {
+                return (dynamic)(JsonSerializer.Deserialize(jsonMessage, type, new JsonSerializerOptions()
+                {
+                    IgnoreNullValues = true,
+                    IgnoreReadOnlyProperties = true,
+                }));
+            }
+            catch (Exception)
+            {
+                return default;
+            }
+
+        }
+
         public static TClass TryJsonToObject<TClass>(this string jsonMessage)
         {
             try

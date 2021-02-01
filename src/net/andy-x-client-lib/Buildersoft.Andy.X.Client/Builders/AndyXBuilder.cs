@@ -150,5 +150,6 @@ namespace Buildersoft.Andy.X.Client.Builders
     public class AndyXEvents
     {
         public Action<StateChangedContext> OnStateChanged { get; set; }
+        public Action<ClientRegisteredContext> OnClientRegistered { get; set; }
     }
 }

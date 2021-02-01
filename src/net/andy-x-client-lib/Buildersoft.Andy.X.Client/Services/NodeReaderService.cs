@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Buildersoft.Andy.X.Client
+namespace Buildersoft.Andy.X.Client.Abstraction
 {
-    public partial class Reader<TEntity>
+    public abstract partial class ReaderBase<T>
     {
         private class NodeReaderService
         {

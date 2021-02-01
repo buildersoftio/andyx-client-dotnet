@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace Buildersoft.Andy.X.Client
 {
-    public class Writer<TEntity> : WriterBase
+    public class Writer<T> : WriterBase
     {
-        public Writer(AndyXClient andyClient) : base(andyClient, typeof(Writer<TEntity>))
+        public Writer(AndyXClient andyClient) : base(andyClient, typeof(Writer<T>))
         {
         }
 
@@ -20,12 +20,12 @@ namespace Buildersoft.Andy.X.Client
         /// </summary>
         /// <param name="message">Data object to store in a book</param>
         /// <returns>Message id</returns>
-        public async Task<Guid> WriteAsync(TEntity message)
+        public async Task<Guid> WriteAsync(T message)
         {
             if (_writerOptions.DataType == DataTypes.Json)
             {
                 string messageEndpointPath = $"{_andyXOptions.Uri}/{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_writerOptions.Component}/{_writerOptions.Book}";
-                string bodyRaw = message.ObjectToJson<TEntity>();
+                string bodyRaw = message.ObjectToJson<T>();
                 var body = new StringContent(bodyRaw, Encoding.UTF8, "application/json");
 
                 var response = await _client.PostAsync(messageEndpointPath, body);
@@ -48,12 +48,12 @@ namespace Buildersoft.Andy.X.Client
         /// <param name="msgId">Id of message to store</param>
         /// <param name="message">Data object to store in a book</param>
         /// <returns>Message id</returns>
-        public async Task<Guid> WriteAsync(Guid msgId, TEntity message)
+        public async Task<Guid> WriteAsync(Guid msgId, T message)
         {
             if (_writerOptions.DataType == DataTypes.Json)
             {
                 string messageEndpointPath = $"{_andyXOptions.Uri}/{_andyXOptions.Tenant}/{_andyXOptions.Product}/{_writerOptions.Component}/{_writerOptions.Book}?msgId={msgId}";
-                string bodyRaw = message.ObjectToJson<TEntity>();
+                string bodyRaw = message.ObjectToJson<T>();
                 var body = new StringContent(bodyRaw, Encoding.UTF8, "application/json");
 
                 var response = await _client.PostAsync(messageEndpointPath, body);
