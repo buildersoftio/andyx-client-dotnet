@@ -11,10 +11,10 @@ namespace Buildersoft.Andy.X.Client.Abstraction
 {
     public abstract class WriterBase
     {
-        public readonly HttpClient _client;
-        public readonly ILogger _logger;
-        public readonly AndyXOptions _andyXOptions;
-        public readonly WriterOptions _writerOptions;
+        protected readonly HttpClient _client;
+        protected readonly ILogger _logger;
+        protected readonly AndyXOptions _andyXOptions;
+        protected readonly WriterOptions _writerOptions;
 
         public WriterBase(AndyXClient andyClient, Type type)
         {

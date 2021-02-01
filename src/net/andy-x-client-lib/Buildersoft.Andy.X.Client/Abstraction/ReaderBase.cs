@@ -17,13 +17,12 @@ namespace Buildersoft.Andy.X.Client.Abstraction
         public delegate void OnMessageReceivedHandler(object sender, MessageEventArgs e);
         public event OnMessageReceivedHandler MessageReceived;
 
+        private readonly HttpClient _client;
+        private readonly ILogger _logger;
 
-        public readonly HttpClient _client;
-        public readonly ILogger _logger;
-
-        public readonly AndyXClient _andyXClient;
-        public readonly AndyXOptions _andyXOptions;
-        public readonly ReaderOptions _readerOptions;
+        private readonly AndyXClient _andyXClient;
+        private readonly AndyXOptions _andyXOptions;
+        private readonly ReaderOptions _readerOptions;
         private NodeReaderService nodeService;
 
         private readonly Type _type;
@@ -42,7 +41,7 @@ namespace Buildersoft.Andy.X.Client.Abstraction
             _logger = _andyXOptions
                 .Logger
                 .GetLoggerFactory()
-                .CreateLogger<Reader<T>>();
+                .CreateLogger(_type);
 
             _client = new HttpClient(_andyXOptions.HttpClientHandler);
             if (_andyXOptions.Token != "")
