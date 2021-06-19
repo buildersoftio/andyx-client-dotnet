@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net6.0;net5;netcoreapp3.1;netcoreapp2.1;netstandard2.1;netstandard2.0</TargetFrameworks>
+    <AssemblyVersion>2.0.0.0</AssemblyVersion>
+    <FileVersion>2.0.0.0</FileVersion>
+    <Product>Buildersoft Andy X</Product>
+    <Company>Buildersoft</Company>
+    <Authors>Buildersoft</Authors>
+    <Copyright>Copyright © Buildersoft 2021</Copyright>
+    <Description>
+      Andy X is an open-source distributed streaming platform designed to deliver the best performance possible for high-performance data pipelines, streaming analytics, streaming between microservices and data integrations.
+      This library offers flexible messaging models with high-level APIs for NET.
+    </Description>
+    <RepositoryUrl>https://github.com/buildersoftdev/andyxclient</RepositoryUrl>
+    <PackageTags>Andy Streams DDD EDA Event Domain Reactive Streaming Distributed</PackageTags>
+    <Version>2.0.0.0</Version>
+    <PackageLicenseFile>license.md</PackageLicenseFile>
+    <PackageIcon>andyX.png</PackageIcon>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
+    <PackageReference Include="NJsonSchema" Version="10.3.3" />
+    <PackageReference Include="System.Text.Json" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Assets\andyX.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="Assets\license.md">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Assets\" />
+    <Folder Include="Builders\" />
+    <Folder Include="Providers\Consumers\" />
+    <Folder Include="Events\Consumers\" />
+  </ItemGroup>
+  
+</Project>

@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30717.126
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31410.414
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Buildersoft.Andy.X.Client", "Buildersoft.Andy.X.Client\Buildersoft.Andy.X.Client.csproj", "{6CF188F9-2364-41BA-89DE-98B6ABB3F811}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Buildersoft.Andy.X.Client", "Buildersoft.Andy.X.Client\Buildersoft.Andy.X.Client.csproj", "{6CF188F9-2364-41BA-89DE-98B6ABB3F811}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Andy.X.Client", "Andy.X.Client\Andy.X.Client.csproj", "{893472D9-5E72-42F8-8E3D-2177315EFA15}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{6CF188F9-2364-41BA-89DE-98B6ABB3F811}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6CF188F9-2364-41BA-89DE-98B6ABB3F811}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6CF188F9-2364-41BA-89DE-98B6ABB3F811}.Release|Any CPU.Build.0 = Release|Any CPU
+		{893472D9-5E72-42F8-8E3D-2177315EFA15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{893472D9-5E72-42F8-8E3D-2177315EFA15}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{893472D9-5E72-42F8-8E3D-2177315EFA15}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{893472D9-5E72-42F8-8E3D-2177315EFA15}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

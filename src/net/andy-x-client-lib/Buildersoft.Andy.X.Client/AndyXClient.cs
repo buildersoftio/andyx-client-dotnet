@@ -1,14 +1,9 @@
-﻿using Buildersoft.Andy.X.Client.Abstraction;
-using Buildersoft.Andy.X.Client.Builders;
+﻿using Buildersoft.Andy.X.Client.Builders;
 using Buildersoft.Andy.X.Client.Configurations;
-using Buildersoft.Andy.X.Client.Configurations.Logging;
 using Buildersoft.Andy.X.Client.Events;
-using Buildersoft.Andy.X.Client.Factories;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Buildersoft.Andy.X.Client

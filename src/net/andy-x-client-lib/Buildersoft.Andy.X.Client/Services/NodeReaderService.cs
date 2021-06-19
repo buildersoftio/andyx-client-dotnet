@@ -72,6 +72,7 @@ namespace Buildersoft.Andy.X.Client.Abstraction
             /// <returns></returns>
             public async Task AcknowledgeMessage(MessageAckDetail message)
             {
+
                 await _connection.SendAsync("AcknowledgeMessage", message);
             }
         }

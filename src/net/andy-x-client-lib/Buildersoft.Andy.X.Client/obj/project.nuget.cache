@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "SFjsTCgwI/aNXhvDTQuS675dSipU6vFduQbwkzX939iR5ue53dPjWRUvzltZGhyh1HKJPudL/jZWiVCOosWywg==",
+  "dgSpecHash": "u2NG2Bv6PcjBuG1fSeLCKLxc4sIue++kDgMV1cqJdh/RHm4AQXdROqi2LxnF3BVqpOTkOuJFwsqqbK2C8+9tiA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\enesh\\source\\repos\\andyxclient-github\\src\\net\\andy-x-client-lib\\Buildersoft.Andy.X.Client\\Buildersoft.Andy.X.Client.csproj",
+  "projectFilePath": "C:\\Users\\enesh\\source\\Buildersoft\\Andy X\\andyxclient-github\\src\\net\\andy-x-client-lib\\Buildersoft.Andy.X.Client\\Buildersoft.Andy.X.Client.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\enesh\\.nuget\\packages\\microsoft.aspnetcore.connections.abstractions\\5.0.1\\microsoft.aspnetcore.connections.abstractions.5.0.1.nupkg.sha512",
     "C:\\Users\\enesh\\.nuget\\packages\\microsoft.aspnetcore.http.abstractions\\2.2.0\\microsoft.aspnetcore.http.abstractions.2.2.0.nupkg.sha512",

@@ -1,6 +1,5 @@
 ﻿using Buildersoft.Andy.X.Client.Abstraction;
 using Buildersoft.Andy.X.Client.Builders;
-using Buildersoft.Andy.X.Client.Configurations;
 using Buildersoft.Andy.X.Client.Factories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
