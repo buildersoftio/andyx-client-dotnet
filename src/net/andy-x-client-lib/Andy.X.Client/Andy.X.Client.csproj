@@ -42,7 +42,6 @@
   <ItemGroup>
     <Folder Include="Assets\" />
     <Folder Include="Builders\" />
-    <Folder Include="Providers\Consumers\" />
   </ItemGroup>
   
 </Project>

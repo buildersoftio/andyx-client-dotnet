@@ -23,6 +23,7 @@ namespace Andy.X.Client.Abstractions
                 _connection.On<ProducerDisconnectedArgs>("ProducerDisconnected", disconnected => ProducerDisconnected?.Invoke(disconnected));
                 _connection.On<MessageStoredArgs>("MessageStored", received => MessageStored?.Invoke(received));
             }
+
             public async Task ConnectAsync()
             {
                 await _connection.StartAsync().ContinueWith(task =>
@@ -34,11 +35,7 @@ namespace Andy.X.Client.Abstractions
                 });
             }
 
-            /// <summary>
-            /// Disconnect from Andy X Node
-            /// </summary>
-            /// <returns></returns>
-            public async Task CloseConnectionAsync()
+            public async Task DisconnectAsync()
             {
                 await _connection.StopAsync().ContinueWith(task =>
                 {

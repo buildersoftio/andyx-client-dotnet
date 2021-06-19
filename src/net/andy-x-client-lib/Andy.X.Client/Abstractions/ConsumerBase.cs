@@ -1,5 +1,6 @@
 ﻿using Andy.X.Client.Configurations;
 using Andy.X.Client.Events.Consumers;
+using System;
 using System.Threading.Tasks;
 
 namespace Andy.X.Client.Abstractions
@@ -11,6 +12,7 @@ namespace Andy.X.Client.Abstractions
         private readonly XClient xClient;
         private readonly ConsumerConfiguration consumerConfiguration;
 
+        private ConsumerNodeService consumerNodeService;
         private bool isBuilt = false;
         private bool isConnected = false;
 
@@ -38,7 +40,6 @@ namespace Andy.X.Client.Abstractions
         {
             consumerConfiguration.Component = component;
             return this;
-
         }
 
         public ConsumerBase<T> Topic(string topic)
@@ -61,19 +62,55 @@ namespace Andy.X.Client.Abstractions
 
         public ConsumerBase<T> Build()
         {
+            consumerNodeService = new ConsumerNodeService(new ConsumerNodeProvider(xClient.GetClientConfiguration(), consumerConfiguration));
+            consumerNodeService.ConsumerConnected += ConsumerNodeService_ConsumerConnected;
+            consumerNodeService.ConsumerDisconnected += ConsumerNodeService_ConsumerDisconnected;
+            consumerNodeService.MessageInternalReceived += ConsumerNodeService_MessageInternalReceived;
 
             isBuilt = true;
 
             return this;
         }
+
+
         public async Task SubscribeAsync()
         {
-            // CONNECT
+            if (isBuilt != true)
+                throw new Exception("Consumer should be built before subscribing to topic");
+
+            if (isConnected != true)
+            {
+                await consumerNodeService.ConnectAsync();
+                isConnected = true;
+            }
         }
 
         public async Task UnsubscribeAsync()
         {
-            // Disconnect
+            if (isBuilt != true)
+                throw new Exception("Producer should be built before unsubscribing to topic");
+            if (isConnected == true)
+            {
+                await consumerNodeService.DisconnectAsync();
+                isConnected = false;
+            }
+        }
+
+        private void ConsumerNodeService_MessageInternalReceived(MessageInternalReceivedArgs obj)
+        {
+            MessageReceived?.Invoke(this, new MessageReceivedArgs(obj.Id, obj.MessageRaw));
+        }
+
+        private void ConsumerNodeService_ConsumerDisconnected(ConsumerDisconnectedArgs obj)
+        {
+            Console.WriteLine($"andyx|{obj.Tenant}|{obj.Product}|{obj.Component}|{obj.Topic}|consumers#{obj.ConsumerName}|{obj.Id}|disconnected");
+
+        }
+
+        private void ConsumerNodeService_ConsumerConnected(ConsumerConnectedArgs obj)
+        {
+            Console.WriteLine($"andyx|{obj.Tenant}|{obj.Product}|{obj.Component}|{obj.Topic}|consumers#{obj.ConsumerName}|{obj.Id}|connected");
+
         }
 
     }

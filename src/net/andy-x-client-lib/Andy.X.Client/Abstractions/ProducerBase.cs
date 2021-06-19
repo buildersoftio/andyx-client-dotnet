@@ -77,7 +77,7 @@ namespace Andy.X.Client.Abstractions
                 throw new Exception("Producer should be built before closing the connection");
             if (isConnected == true)
             {
-                await producerNodeService.CloseConnectionAsync();
+                await producerNodeService.DisconnectAsync();
                 isConnected = false;
             }
         }
@@ -112,7 +112,6 @@ namespace Andy.X.Client.Abstractions
         public Guid Produce(T tObject)
         {
             return ProduceAsync(tObject).Result;
-
         }
 
         public async Task<Guid> ProduceAsync(T tObject)
