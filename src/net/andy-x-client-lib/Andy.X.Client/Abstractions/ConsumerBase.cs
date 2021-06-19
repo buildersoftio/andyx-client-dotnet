@@ -9,6 +9,7 @@ namespace Andy.X.Client.Abstractions
     {
         public delegate void OnMessageReceivedHandler(object sender, MessageReceivedArgs e);
         public event OnMessageReceivedHandler MessageReceived;
+
         private readonly XClient xClient;
         private readonly ConsumerConfiguration consumerConfiguration;
 
@@ -72,6 +73,10 @@ namespace Andy.X.Client.Abstractions
             return this;
         }
 
+        private void ConsumerNodeService_Test(string obj)
+        {
+            Console.WriteLine(obj);
+        }
 
         public async Task SubscribeAsync()
         {

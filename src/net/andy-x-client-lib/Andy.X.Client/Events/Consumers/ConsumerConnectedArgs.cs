@@ -15,7 +15,6 @@ namespace Andy.X.Client.Abstractions
 
             public Guid Id { get; set; }
             public string ConsumerName { get; set; }
-            public SubscriptionType SubscriptionType { get; set; }
         }
     }
 }
