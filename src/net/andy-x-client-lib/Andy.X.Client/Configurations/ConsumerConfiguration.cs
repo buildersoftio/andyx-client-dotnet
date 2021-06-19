@@ -7,6 +7,11 @@
         public string Name { get; set; }
 
         public SubscriptionType SubscriptionType { get; set; }
+
+        public ConsumerConfiguration()
+        {
+            SubscriptionType = SubscriptionType.Exclusive;
+        }
     }
 
     public enum SubscriptionType

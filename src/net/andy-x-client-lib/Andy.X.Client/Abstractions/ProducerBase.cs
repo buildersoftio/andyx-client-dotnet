@@ -32,6 +32,11 @@ namespace Andy.X.Client.Abstractions
             this.xClient = xClient.CreateClient();
             producerConfiguration = new ProducerConfiguration();
         }
+        public ProducerBase(IXClientFactory xClient, ProducerConfiguration producerConfiguration)
+        {
+            this.xClient = xClient.CreateClient();
+            this.producerConfiguration = producerConfiguration;
+        }
 
 
         public ProducerBase<T> Component(string component)
