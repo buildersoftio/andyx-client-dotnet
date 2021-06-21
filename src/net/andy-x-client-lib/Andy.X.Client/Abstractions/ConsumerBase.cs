@@ -1,5 +1,6 @@
 ﻿using Andy.X.Client.Configurations;
 using Andy.X.Client.Events.Consumers;
+using Andy.X.Client.Extensions;
 using System;
 using System.Threading.Tasks;
 
@@ -7,7 +8,7 @@ namespace Andy.X.Client.Abstractions
 {
     public abstract partial class ConsumerBase<T>
     {
-        public delegate void OnMessageReceivedHandler(object sender, MessageReceivedArgs e);
+        public delegate void OnMessageReceivedHandler(object sender, MessageReceivedArgs<T> e);
         public event OnMessageReceivedHandler MessageReceived;
 
         private readonly XClient xClient;
@@ -103,7 +104,8 @@ namespace Andy.X.Client.Abstractions
 
         private void ConsumerNodeService_MessageInternalReceived(MessageInternalReceivedArgs obj)
         {
-            MessageReceived?.Invoke(this, new MessageReceivedArgs(obj.Id, obj.MessageRaw));
+            T parsedData = obj.MessageRaw.ToJson().TryJsonToObject<T>();
+            MessageReceived?.Invoke(this, new MessageReceivedArgs<T>(obj.Id, obj.MessageRaw, parsedData));
         }
 
         private void ConsumerNodeService_ConsumerDisconnected(ConsumerDisconnectedArgs obj)
