@@ -8,7 +8,7 @@ namespace Andy.X.Client.Abstractions
 {
     public abstract partial class ConsumerBase<T>
     {
-        public delegate void OnMessageReceivedHandler(object sender, MessageReceivedArgs<T> e);
+        public delegate bool OnMessageReceivedHandler(object sender, MessageReceivedArgs<T> e);
         public event OnMessageReceivedHandler MessageReceived;
 
         private readonly XClient xClient;
@@ -102,10 +102,40 @@ namespace Andy.X.Client.Abstractions
             }
         }
 
-        private void ConsumerNodeService_MessageInternalReceived(MessageInternalReceivedArgs obj)
+        private async void ConsumerNodeService_MessageInternalReceived(MessageInternalReceivedArgs obj)
         {
             T parsedData = obj.MessageRaw.ToJson().TryJsonToObject<T>();
-            MessageReceived?.Invoke(this, new MessageReceivedArgs<T>(obj.Id, obj.MessageRaw, parsedData));
+            try
+            {
+                bool? isMessageAcknowledged = MessageReceived?.Invoke(this, new MessageReceivedArgs<T>(obj.Id, obj.MessageRaw, parsedData));
+                if (isMessageAcknowledged.HasValue)
+                {
+                    await consumerNodeService.AcknowledgeMessage(new AcknowledgeMessageArgs()
+                    {
+                        Tenant = obj.Tenant,
+                        Product = obj.Product,
+                        Component = obj.Component,
+                        Topic = obj.Topic,
+                        Consumer = consumerConfiguration.Name,
+                        IsAcknowledged = isMessageAcknowledged.Value,
+                        MessageId = obj.Id
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                await consumerNodeService.AcknowledgeMessage(new AcknowledgeMessageArgs()
+                {
+                    Tenant = obj.Tenant,
+                    Product = obj.Product,
+                    Component = obj.Component,
+                    Topic = obj.Topic,
+                    Consumer = consumerConfiguration.Name,
+                    IsAcknowledged = false,
+                    MessageId = obj.Id
+                });
+                throw new Exception($"MessageReceived failed to process, message is not acknowledged. Error description: '{ex.Message}'");
+            }
         }
 
         private void ConsumerNodeService_ConsumerDisconnected(ConsumerDisconnectedArgs obj)

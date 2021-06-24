@@ -44,6 +44,10 @@ namespace Andy.X.Client.Abstractions
                     }
                 });
             }
+            public async Task AcknowledgeMessage(AcknowledgeMessageArgs  acknowledgeMessageArgs)
+            {
+                await _connection.SendAsync("AcknowledgeMessage", acknowledgeMessageArgs);
+            }
         }
     }
 }
