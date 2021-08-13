@@ -1,4 +1,5 @@
 ﻿using Andy.X.Client.Configurations;
+using Microsoft.Extensions.Logging;
 
 namespace Andy.X.Client
 {
@@ -25,6 +26,12 @@ namespace Andy.X.Client
         public XClient Product(string product)
         {
             xClientConfiguration.Product = product;
+            return this;
+        }
+
+        public XClient Logging(ILoggerFactory loggerFactory)
+        {
+            xClientConfiguration.Logging = new XClientLogging(loggerFactory);
             return this;
         }
 

@@ -1,6 +1,7 @@
 ﻿using Andy.X.Client.Configurations;
 using Andy.X.Client.Events.Consumers;
 using Andy.X.Client.Extensions;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
@@ -13,6 +14,8 @@ namespace Andy.X.Client.Abstractions
 
         private readonly XClient xClient;
         private readonly ConsumerConfiguration consumerConfiguration;
+        private readonly ILogger logger;
+
 
         private ConsumerNodeService consumerNodeService;
         private bool isBuilt = false;
@@ -22,20 +25,38 @@ namespace Andy.X.Client.Abstractions
         {
             this.xClient = xClient;
             consumerConfiguration = new ConsumerConfiguration();
+            logger = this.xClient.GetClientConfiguration()
+                .Logging
+                .GetLoggerFactory()
+                .CreateLogger(typeof(T));
         }
         public ConsumerBase(XClient xClient, ConsumerConfiguration consumerConfiguration)
         {
             this.xClient = xClient;
             this.consumerConfiguration = consumerConfiguration;
+            logger = this.xClient.GetClientConfiguration()
+                .Logging
+                .GetLoggerFactory()
+                .CreateLogger(typeof(T));
         }
         public ConsumerBase(IXClientFactory xClient)
         {
             this.xClient = xClient.CreateClient();
+
+            logger = this.xClient.GetClientConfiguration()
+                .Logging
+                .GetLoggerFactory()
+                .CreateLogger(typeof(T));
         }
         public ConsumerBase(IXClientFactory xClient, ConsumerConfiguration consumerConfiguration)
         {
             this.xClient = xClient.CreateClient();
             this.consumerConfiguration = consumerConfiguration;
+
+            logger = this.xClient.GetClientConfiguration()
+                .Logging
+                .GetLoggerFactory()
+                .CreateLogger(typeof(T));
         }
 
         public ConsumerBase<T> Component(string component)
@@ -89,7 +110,7 @@ namespace Andy.X.Client.Abstractions
         public async Task UnsubscribeAsync()
         {
             if (isBuilt != true)
-                throw new Exception("Producer should be built before unsubscribing to topic");
+                throw new Exception("Consumer should be built before unsubscribing to topic");
             if (isConnected == true)
             {
                 await consumerNodeService.DisconnectAsync();
@@ -129,21 +150,19 @@ namespace Andy.X.Client.Abstractions
                     IsAcknowledged = false,
                     MessageId = obj.Id
                 });
-                throw new Exception($"MessageReceived failed to process, message is not acknowledged. Error description: '{ex.Message}'");
+                logger.LogError($"MessageReceived failed to process, message is not acknowledged. Error description: '{ex.Message}'");
             }
         }
 
         private void ConsumerNodeService_ConsumerDisconnected(ConsumerDisconnectedArgs obj)
         {
-            Console.WriteLine($"andyx|{obj.Tenant}|{obj.Product}|{obj.Component}|{obj.Topic}|consumers#{obj.ConsumerName}|{obj.Id}|disconnected");
-
+            logger.LogWarning($"andyx|{obj.Tenant}|{obj.Product}|{obj.Component}|{obj.Topic}|consumers#{obj.ConsumerName}|{obj.Id}|disconnected");
         }
 
         private void ConsumerNodeService_ConsumerConnected(ConsumerConnectedArgs obj)
         {
-            Console.WriteLine($"andyx|{obj.Tenant}|{obj.Product}|{obj.Component}|{obj.Topic}|consumers#{obj.ConsumerName}|{obj.Id}|connected");
+            logger.LogInformation($"andyx|{obj.Tenant}|{obj.Product}|{obj.Component}|{obj.Topic}|consumers#{obj.ConsumerName}|{obj.Id}|connected");
 
         }
-
     }
 }
