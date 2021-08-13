@@ -5,6 +5,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 
 namespace Andy.X.Client.Abstractions
 {
@@ -12,6 +13,7 @@ namespace Andy.X.Client.Abstractions
     {
         private readonly XClient xClient;
         private readonly ProducerConfiguration producerConfiguration;
+        private readonly ILogger logger;
 
         public delegate void OnMessageStoredHandler(object sender, MessageStoredArgs e);
         public event OnMessageStoredHandler MessageStored;
@@ -27,11 +29,22 @@ namespace Andy.X.Client.Abstractions
         {
             this.xClient = xClient;
             producerConfiguration = new ProducerConfiguration();
+
+            logger = this.xClient.GetClientConfiguration()
+                .Logging
+                .GetLoggerFactory()
+                .CreateLogger(typeof(T));
         }
         public ProducerBase(XClient xClient, ProducerConfiguration producerConfiguration)
         {
             this.xClient = xClient;
             this.producerConfiguration = producerConfiguration;
+
+            logger = this.xClient.GetClientConfiguration()
+                .Logging
+                .GetLoggerFactory()
+                .CreateLogger(typeof(T));
+
             if (producerConfiguration.RetryProducing == true)
                 unsentMessagesBuffer = new ConcurrentQueue<RetryTransmitMessage>();
         }
@@ -39,11 +52,22 @@ namespace Andy.X.Client.Abstractions
         {
             this.xClient = xClient.CreateClient();
             producerConfiguration = new ProducerConfiguration();
+
+            logger = this.xClient.GetClientConfiguration()
+                .Logging
+                .GetLoggerFactory()
+                .CreateLogger(typeof(T));
+
         }
         public ProducerBase(IXClientFactory xClient, ProducerConfiguration producerConfiguration)
         {
             this.xClient = xClient.CreateClient();
             this.producerConfiguration = producerConfiguration;
+
+            logger = this.xClient.GetClientConfiguration()
+                .Logging
+                .GetLoggerFactory()
+                .CreateLogger(typeof(T));
 
             if (producerConfiguration.RetryProducing == true)
                 unsentMessagesBuffer = new ConcurrentQueue<RetryTransmitMessage>();
@@ -127,12 +151,12 @@ namespace Andy.X.Client.Abstractions
 
         private void ProducerNodeService_ProducerDisconnected(ProducerDisconnectedArgs obj)
         {
-            Console.WriteLine($"andyx|{obj.Tenant}|{obj.Product}|{obj.Component}|{obj.Topic}|producers#{obj.ProducerName}|{obj.Id}|disconnected");
+            logger.LogWarning($"andyx|{obj.Tenant}|{obj.Product}|{obj.Component}|{obj.Topic}|producers#{obj.ProducerName}|{obj.Id}|disconnected");
         }
 
         private void ProducerNodeService_ProducerConnected(ProducerConnectedArgs obj)
         {
-            Console.WriteLine($"andyx|{obj.Tenant}|{obj.Product}|{obj.Component}|{obj.Topic}|producers#{obj.ProducerName}|{obj.Id}|connected");
+            logger.LogInformation($"andyx|{obj.Tenant}|{obj.Product}|{obj.Component}|{obj.Topic}|producers#{obj.ProducerName}|{obj.Id}|connected");
         }
 
         public Guid Produce(T tObject)
@@ -173,6 +197,7 @@ namespace Andy.X.Client.Abstractions
 
         private void EnqueueMessageToBuffer(TransmitMessageArgs message)
         {
+            logger.LogWarning($"andyx|{message.Tenant}|{message.Product}|{message.Component}|{message.Topic}|producing#msg|{message.Id}|failed#retrying|1 of {producerConfiguration.RetryProducingMessageNTimes}|tries");
             if (producerConfiguration.RetryProducing == true)
             {
                 unsentMessagesBuffer.Enqueue(new RetryTransmitMessage()
@@ -222,12 +247,16 @@ namespace Andy.X.Client.Abstractions
                         else
                             unsentMessagesBuffer.Enqueue(retryTransmitMessage);
                     }
-
-                    // If RetryCounter is bigger than RetryProducerMessageNTimes ignore that message.
+                    else
+                    {
+                        // If RetryCounter is bigger than RetryProducerMessageNTimes ignore that message.
+                        logger.LogError($"andyx|{retryTransmitMessage.TransmitMessageArgs.Tenant}|{retryTransmitMessage.TransmitMessageArgs.Product}|" +
+                            $"{retryTransmitMessage.TransmitMessageArgs.Component}|{retryTransmitMessage.TransmitMessageArgs.Topic}|producing#msg|{retryTransmitMessage.TransmitMessageArgs.Id}" +
+                            $"|failed#after {producerConfiguration.RetryProducingMessageNTimes}|tries|message#lost");
+                    }
 
                 }
             }
-
             isUnsentMessagesProcessorWorking = false;
         }
         #endregion
