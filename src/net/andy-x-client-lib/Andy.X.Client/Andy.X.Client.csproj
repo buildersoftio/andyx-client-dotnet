@@ -17,7 +17,7 @@
     <Version>2.0.0-preview</Version>
     <PackageLicenseFile>license.md</PackageLicenseFile>
     <PackageIcon>andyX.png</PackageIcon>
-    <PackageId>Buildersoft.Andy.X</PackageId>
+    <PackageId>Buildersoft.Andy.X.Client</PackageId>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <IsPublishable>True</IsPublishable>
