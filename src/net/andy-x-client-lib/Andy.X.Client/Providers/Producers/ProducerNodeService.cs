@@ -50,6 +50,11 @@ namespace Andy.X.Client.Abstractions
             {
                 await _connection.SendAsync("TransmitMessage", transmitMessageArgs);
             }
+
+            public HubConnectionState GetConnectionState()
+            {
+                return _connection.State;
+            }
         }
     }
 }

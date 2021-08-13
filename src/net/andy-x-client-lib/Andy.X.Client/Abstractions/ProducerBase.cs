@@ -1,7 +1,10 @@
 ﻿using Andy.X.Client.Configurations;
 using Andy.X.Client.Events.Producers;
+using Microsoft.AspNetCore.SignalR.Client;
 using System;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace Andy.X.Client.Abstractions
 {
@@ -17,6 +20,9 @@ namespace Andy.X.Client.Abstractions
         private bool isBuilt = false;
         private bool isConnected = false;
 
+        private ConcurrentQueue<RetryTransmitMessage> unsentMessagesBuffer;
+        private bool isUnsentMessagesProcessorWorking = false;
+
         public ProducerBase(XClient xClient)
         {
             this.xClient = xClient;
@@ -26,6 +32,8 @@ namespace Andy.X.Client.Abstractions
         {
             this.xClient = xClient;
             this.producerConfiguration = producerConfiguration;
+            if (producerConfiguration.RetryProducing == true)
+                unsentMessagesBuffer = new ConcurrentQueue<RetryTransmitMessage>();
         }
         public ProducerBase(IXClientFactory xClient)
         {
@@ -36,6 +44,9 @@ namespace Andy.X.Client.Abstractions
         {
             this.xClient = xClient.CreateClient();
             this.producerConfiguration = producerConfiguration;
+
+            if (producerConfiguration.RetryProducing == true)
+                unsentMessagesBuffer = new ConcurrentQueue<RetryTransmitMessage>();
         }
 
 
@@ -54,6 +65,21 @@ namespace Andy.X.Client.Abstractions
         public ProducerBase<T> Name(string name)
         {
             producerConfiguration.Name = name;
+            return this;
+        }
+
+        public ProducerBase<T> RetryProducing(bool isRetryProducingActive)
+        {
+            producerConfiguration.RetryProducing = isRetryProducingActive;
+            if (isRetryProducingActive == true)
+                unsentMessagesBuffer = new ConcurrentQueue<RetryTransmitMessage>();
+
+            return this;
+        }
+
+        public ProducerBase<T> RetryProducingMessageNTimes(int nTimesRetry)
+        {
+            producerConfiguration.RetryProducingMessageNTimes = nTimesRetry;
             return this;
         }
 
@@ -126,8 +152,84 @@ namespace Andy.X.Client.Abstractions
                 MessageRaw = tObject
             };
 
-            await producerNodeService.TransmitMessage(message);
+            if (producerNodeService.GetConnectionState() == HubConnectionState.Connected)
+            {
+                try
+                {
+                    await producerNodeService.TransmitMessage(message);
+                }
+                catch (Exception)
+                {
+                    EnqueueMessageToBuffer(message);
+                }
+            }
+            else
+            {
+                EnqueueMessageToBuffer(message);
+            }
+
             return message.Id;
         }
+
+        private void EnqueueMessageToBuffer(TransmitMessageArgs message)
+        {
+            if (producerConfiguration.RetryProducing == true)
+            {
+                unsentMessagesBuffer.Enqueue(new RetryTransmitMessage()
+                {
+                    TransmitMessageArgs = message,
+                    RetryCounter = 1
+                });
+
+                InitializeUnsentMessageProcessor();
+            }
+        }
+
+        #region UnsentMessageProcessor
+        private void InitializeUnsentMessageProcessor()
+        {
+            if (isUnsentMessagesProcessorWorking != true)
+            {
+                isUnsentMessagesProcessorWorking = true;
+
+                new Thread(() => UnsentMessageProcessor()).Start();
+            }
+        }
+
+        private async void UnsentMessageProcessor()
+        {
+            while (unsentMessagesBuffer.IsEmpty != true)
+            {
+                RetryTransmitMessage retryTransmitMessage;
+                bool isMessageReturned = unsentMessagesBuffer.TryDequeue(out retryTransmitMessage);
+                if (isMessageReturned == true)
+                {
+                    if (retryTransmitMessage.RetryCounter < producerConfiguration.RetryProducingMessageNTimes)
+                    {
+                        retryTransmitMessage.RetryCounter++;
+
+                        if (producerNodeService.GetConnectionState() == HubConnectionState.Connected)
+                        {
+                            try
+                            {
+                                await producerNodeService.TransmitMessage(retryTransmitMessage.TransmitMessageArgs);
+                            }
+                            catch (Exception)
+                            {
+                                unsentMessagesBuffer.Enqueue(retryTransmitMessage);
+                            }
+                        }
+                        else
+                            unsentMessagesBuffer.Enqueue(retryTransmitMessage);
+                    }
+
+                    // If RetryCounter is bigger than RetryProducerMessageNTimes ignore that message.
+
+                }
+            }
+
+            isUnsentMessagesProcessorWorking = false;
+        }
+        #endregion
     }
 }
