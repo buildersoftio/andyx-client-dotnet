@@ -14,7 +14,7 @@
     </Description>
     <RepositoryUrl>https://github.com/buildersoftdev/andyxclient</RepositoryUrl>
     <PackageTags>Andy Streams DDD EDA Event Domain Reactive Streaming Distributed</PackageTags>
-    <Version>2.0.0-preview</Version>
+    <Version>2.0.2-preview</Version>
     <PackageLicenseFile>license.md</PackageLicenseFile>
     <PackageIcon>andyX.png</PackageIcon>
     <PackageId>Buildersoft.Andy.X.Client</PackageId>
