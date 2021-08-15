@@ -21,16 +21,11 @@ namespace Andy.X.Client.Abstractions
                 _connection = new HubConnectionBuilder()
                     .WithUrl($"{xClientConfig.XNodeUrl}/realtime/v2/producer", option =>
                     {
-
-                        // TODO: The ClientHandler will be removed from production
                         option.HttpMessageHandlerFactory = (message) =>
                         {
                             if (message is HttpClientHandler httpClientHandler)
-                            {
                                 httpClientHandler.ServerCertificateCustomValidationCallback +=
                                     (sender, certificate, chain, sslPolicyErrors) => { return true; };
-                            }
-
                             return message;
                         };
 
