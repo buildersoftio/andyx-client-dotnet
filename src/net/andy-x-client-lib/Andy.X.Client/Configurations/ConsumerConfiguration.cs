@@ -3,14 +3,20 @@
     public class ConsumerConfiguration
     {
         public string Component { get; set; }
+        public bool IsTopicPersistent { get; set; }
         public string Topic { get; set; }
         public string Name { get; set; }
 
         public SubscriptionType SubscriptionType { get; set; }
+        public InitialPosition InitialPosition { get; set; }
+
 
         public ConsumerConfiguration()
         {
+            IsTopicPersistent = true;
+
             SubscriptionType = SubscriptionType.Exclusive;
+            InitialPosition = InitialPosition.Latest;
         }
     }
 

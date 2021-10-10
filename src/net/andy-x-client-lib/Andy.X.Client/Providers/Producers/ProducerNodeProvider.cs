@@ -35,6 +35,8 @@ namespace Andy.X.Client.Abstractions
                         option.Headers["x-andyx-component"] = producerConfig.Component;
                         option.Headers["x-andyx-topic"] = producerConfig.Topic;
                         option.Headers["x-andyx-producer"] = producerConfig.Name;
+
+                        option.Headers["x-andyx-topic-is-persistent"] = producerConfig.IsTopicPersistent.ToString();
                     })
                     .WithAutomaticReconnect()
                     .Build();
