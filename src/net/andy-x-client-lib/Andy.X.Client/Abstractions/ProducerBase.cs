@@ -109,7 +109,7 @@ namespace Andy.X.Client.Abstractions
 
         public async Task<ProducerBase<T>> BuildAsync()
         {
-            producerNodeService = new ProducerNodeService(new ProducerNodeProvider(xClient.GetClientConfiguration(), producerConfiguration));
+            producerNodeService = new ProducerNodeService(new ProducerNodeProvider(xClient.GetClientConfiguration(), producerConfiguration), xClient.GetClientConfiguration());
             producerNodeService.ProducerConnected += ProducerNodeService_ProducerConnected;
             producerNodeService.ProducerDisconnected += ProducerNodeService_ProducerDisconnected;
             producerNodeService.MessageStored += ProducerNodeService_MessageStored;

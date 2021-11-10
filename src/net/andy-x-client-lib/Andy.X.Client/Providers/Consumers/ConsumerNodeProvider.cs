@@ -19,7 +19,7 @@ namespace Andy.X.Client.Abstractions
                 this.consumerConfig = consumerConfig;
 
                 _connection = new HubConnectionBuilder()
-                     .WithUrl($"{xClientConfig.XNodeUrl}/realtime/v2/consumer", option =>
+                     .WithUrl($"{xClientConfig.ServiceUrl}/realtime/v2/consumer", option =>
                      {
                          option.HttpMessageHandlerFactory = (message) =>
                          {

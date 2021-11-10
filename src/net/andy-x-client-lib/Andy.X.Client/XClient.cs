@@ -12,9 +12,9 @@ namespace Andy.X.Client
             this.xClientConfiguration = xClientConfiguration;
         }
 
-        public XClient(string xNodeUrl)
+        public XClient(string serviceUrl)
         {
-            xClientConfiguration = new XClientConfiguration(xNodeUrl);
+            xClientConfiguration = new XClientConfiguration(serviceUrl);
         }
 
         public XClient Tenant(string tenant)
@@ -26,6 +26,12 @@ namespace Andy.X.Client
         public XClient Product(string product)
         {
             xClientConfiguration.Product = product;
+            return this;
+        }
+
+        public XClient AutoConnect(bool autoConnect)
+        {
+            xClientConfiguration.AutoConnect = autoConnect;
             return this;
         }
 

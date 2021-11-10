@@ -1,6 +1,8 @@
-﻿using Andy.X.Client.Events.Producers;
+﻿using Andy.X.Client.Configurations;
+using Andy.X.Client.Events.Producers;
 using Microsoft.AspNetCore.SignalR.Client;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Andy.X.Client.Abstractions
@@ -10,14 +12,17 @@ namespace Andy.X.Client.Abstractions
         private class ProducerNodeService
         {
             private readonly HubConnection _connection;
+            private readonly XClientConfiguration _xClientConfiguration;
 
             public event Action<ProducerConnectedArgs> ProducerConnected;
             public event Action<ProducerDisconnectedArgs> ProducerDisconnected;
             public event Action<MessageStoredArgs> MessageStored;
 
-            public ProducerNodeService(ProducerNodeProvider producerNodeProvider)
+            public ProducerNodeService(ProducerNodeProvider producerNodeProvider,
+                XClientConfiguration xClientConfiguration)
             {
                 _connection = producerNodeProvider.GetHubConnection();
+                _xClientConfiguration = xClientConfiguration;
 
                 _connection.On<ProducerConnectedArgs>("ProducerConnected", connectedArgs => ProducerConnected?.Invoke(connectedArgs));
                 _connection.On<ProducerDisconnectedArgs>("ProducerDisconnected", disconnected => ProducerDisconnected?.Invoke(disconnected));
@@ -26,11 +31,18 @@ namespace Andy.X.Client.Abstractions
 
             public async Task ConnectAsync()
             {
-                await _connection.StartAsync().ContinueWith(task =>
+                await _connection.StartAsync().ContinueWith(async task =>
                 {
                     if (task.Exception != null)
                     {
                         Console.WriteLine($"Producer connection to Andy X Node failed, details {task.Exception.Message}");
+                        if (_xClientConfiguration.AutoConnect == true)
+                        {
+                            // retry connection
+                            Thread.Sleep(3000);
+                            Console.WriteLine($"Producer is connectiong to Andy X Node");
+                            await ConnectAsync();
+                        }
                     }
                 });
             }

@@ -83,9 +83,15 @@ namespace Andy.X.Client.Abstractions
             return this;
         }
 
+        public ConsumerBase<T> InitialPosition(InitialPosition initialPosition)
+        {
+            consumerConfiguration.InitialPosition = initialPosition;
+            return this;
+        }
+
         public ConsumerBase<T> Build()
         {
-            consumerNodeService = new ConsumerNodeService(new ConsumerNodeProvider(xClient.GetClientConfiguration(), consumerConfiguration));
+            consumerNodeService = new ConsumerNodeService(new ConsumerNodeProvider(xClient.GetClientConfiguration(), consumerConfiguration), xClient.GetClientConfiguration());
             consumerNodeService.ConsumerConnected += ConsumerNodeService_ConsumerConnected;
             consumerNodeService.ConsumerDisconnected += ConsumerNodeService_ConsumerDisconnected;
             consumerNodeService.MessageInternalReceived += ConsumerNodeService_MessageInternalReceived;
