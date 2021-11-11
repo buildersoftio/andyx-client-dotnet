@@ -4,27 +4,32 @@ namespace Andy.X.Client.Configurations
 {
     public class XClientConfiguration
     {
-        public string XNodeUrl { get; set; }
+        public string ServiceUrl { get; set; }
+
         public string Token { get; set; }
 
         public string Tenant { get; set; }
         public string Product { get; set; }
 
+        public bool AutoConnect { get; set; }
+
         public XClientLogging Logging { get; set; }
 
         public XClientConfiguration()
         {
-            XNodeUrl = "https://localhost:9001";
+            ServiceUrl = "https://localhost:9001";
             Tenant = "default";
             Product = "default";
+            AutoConnect = true;
             Logging = new XClientLogging();
         }
 
-        public XClientConfiguration(string xNodeUrl)
+        public XClientConfiguration(string serviceUrl)
         {
-            XNodeUrl = xNodeUrl;
+            ServiceUrl = serviceUrl;
             Tenant = "default";
             Product = "default";
+            AutoConnect = true;
             Logging = new XClientLogging();
         }
     }

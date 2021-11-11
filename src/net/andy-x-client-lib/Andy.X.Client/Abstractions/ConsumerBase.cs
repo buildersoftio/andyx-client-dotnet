@@ -83,9 +83,15 @@ namespace Andy.X.Client.Abstractions
             return this;
         }
 
+        public ConsumerBase<T> InitialPosition(InitialPosition initialPosition)
+        {
+            consumerConfiguration.InitialPosition = initialPosition;
+            return this;
+        }
+
         public ConsumerBase<T> Build()
         {
-            consumerNodeService = new ConsumerNodeService(new ConsumerNodeProvider(xClient.GetClientConfiguration(), consumerConfiguration));
+            consumerNodeService = new ConsumerNodeService(new ConsumerNodeProvider(xClient.GetClientConfiguration(), consumerConfiguration), xClient.GetClientConfiguration());
             consumerNodeService.ConsumerConnected += ConsumerNodeService_ConsumerConnected;
             consumerNodeService.ConsumerDisconnected += ConsumerNodeService_ConsumerDisconnected;
             consumerNodeService.MessageInternalReceived += ConsumerNodeService_MessageInternalReceived;
@@ -124,6 +130,10 @@ namespace Andy.X.Client.Abstractions
             try
             {
                 bool? isMessageAcknowledged = MessageReceived?.Invoke(this, new MessageReceivedArgs<T>(obj.Id, obj.MessageRaw, parsedData));
+
+                // ignore acknowlegment of message is topic is not persistent
+                if (consumerConfiguration.IsTopicPersistent != true)
+                    return;
                 if (isMessageAcknowledged.HasValue)
                 {
                     await consumerNodeService.AcknowledgeMessage(new AcknowledgeMessageArgs()
@@ -140,6 +150,10 @@ namespace Andy.X.Client.Abstractions
             }
             catch (Exception ex)
             {
+                // ignore acknowlegment of message is topic is not persistent
+                if (consumerConfiguration.IsTopicPersistent != true)
+                    return;
+
                 await consumerNodeService.AcknowledgeMessage(new AcknowledgeMessageArgs()
                 {
                     Tenant = obj.Tenant,

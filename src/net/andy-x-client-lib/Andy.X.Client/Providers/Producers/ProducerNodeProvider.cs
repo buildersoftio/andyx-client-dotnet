@@ -19,7 +19,7 @@ namespace Andy.X.Client.Abstractions
                 this.producerConfig = producerConfig;
 
                 _connection = new HubConnectionBuilder()
-                    .WithUrl($"{xClientConfig.XNodeUrl}/realtime/v2/producer", option =>
+                    .WithUrl($"{xClientConfig.ServiceUrl}/realtime/v2/producer", option =>
                     {
                         option.HttpMessageHandlerFactory = (message) =>
                         {
@@ -35,6 +35,8 @@ namespace Andy.X.Client.Abstractions
                         option.Headers["x-andyx-component"] = producerConfig.Component;
                         option.Headers["x-andyx-topic"] = producerConfig.Topic;
                         option.Headers["x-andyx-producer"] = producerConfig.Name;
+
+                        option.Headers["x-andyx-topic-is-persistent"] = producerConfig.IsTopicPersistent.ToString();
                     })
                     .WithAutomaticReconnect()
                     .Build();
