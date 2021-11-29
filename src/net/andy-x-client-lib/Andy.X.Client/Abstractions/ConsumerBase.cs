@@ -13,7 +13,7 @@ namespace Andy.X.Client.Abstractions
         public event OnMessageReceivedHandler MessageReceived;
 
         private readonly XClient xClient;
-        private readonly ConsumerConfiguration consumerConfiguration;
+        private readonly ConsumerConfiguration<T> consumerConfiguration;
         private readonly ILogger logger;
 
 
@@ -24,13 +24,13 @@ namespace Andy.X.Client.Abstractions
         public ConsumerBase(XClient xClient)
         {
             this.xClient = xClient;
-            consumerConfiguration = new ConsumerConfiguration();
+            consumerConfiguration = new ConsumerConfiguration<T>();
             logger = this.xClient.GetClientConfiguration()
                 .Logging
                 .GetLoggerFactory()
                 .CreateLogger(typeof(T));
         }
-        public ConsumerBase(XClient xClient, ConsumerConfiguration consumerConfiguration)
+        public ConsumerBase(XClient xClient, ConsumerConfiguration<T> consumerConfiguration)
         {
             this.xClient = xClient;
             this.consumerConfiguration = consumerConfiguration;
@@ -48,7 +48,7 @@ namespace Andy.X.Client.Abstractions
                 .GetLoggerFactory()
                 .CreateLogger(typeof(T));
         }
-        public ConsumerBase(IXClientFactory xClient, ConsumerConfiguration consumerConfiguration)
+        public ConsumerBase(IXClientFactory xClient, ConsumerConfiguration<T> consumerConfiguration)
         {
             this.xClient = xClient.CreateClient();
             this.consumerConfiguration = consumerConfiguration;
@@ -126,12 +126,12 @@ namespace Andy.X.Client.Abstractions
 
         private async void ConsumerNodeService_MessageInternalReceived(MessageInternalReceivedArgs obj)
         {
-            T parsedData = obj.MessageRaw.ToJson().TryJsonToObject<T>();
+            T parsedPayload = obj.MessageRaw.ToJson().TryJsonToObject<T>();
             try
             {
-                bool? isMessageAcknowledged = MessageReceived?.Invoke(this, new MessageReceivedArgs<T>(obj.Id, obj.MessageRaw, parsedData));
+                bool? isMessageAcknowledged = MessageReceived?.Invoke(this, new MessageReceivedArgs<T>(obj.Tenant, obj.Product, obj.Component, obj.Topic, obj.Id, obj.MessageRaw, parsedPayload, obj.SentDate));
 
-                // ignore acknowlegment of message is topic is not persistent
+                // Ignore acknowlegment of message is topic is not persistent
                 if (consumerConfiguration.IsTopicPersistent != true)
                     return;
                 if (isMessageAcknowledged.HasValue)

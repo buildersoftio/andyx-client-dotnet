@@ -13,6 +13,8 @@ namespace Andy.X.Client.Abstractions
 
             public Guid Id { get; set; }
             public object MessageRaw { get; set; }
+
+            public DateTime SentDate { get; set; }
         }
     }
 }

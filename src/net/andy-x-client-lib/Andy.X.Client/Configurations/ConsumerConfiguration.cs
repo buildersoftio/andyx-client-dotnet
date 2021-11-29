@@ -1,11 +1,11 @@
 ﻿namespace Andy.X.Client.Configurations
 {
-    public class ConsumerConfiguration
+    public class ConsumerConfiguration<T>
     {
         public string Component { get; set; }
-        public bool IsTopicPersistent { get; set; }
         public string Topic { get; set; }
         public string Name { get; set; }
+        public bool IsTopicPersistent { get; set; }
 
         public SubscriptionType SubscriptionType { get; set; }
         public InitialPosition InitialPosition { get; set; }

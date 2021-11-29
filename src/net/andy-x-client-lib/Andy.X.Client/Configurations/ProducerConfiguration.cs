@@ -1,6 +1,6 @@
 ﻿namespace Andy.X.Client.Configurations
 {
-    public class ProducerConfiguration
+    public class ProducerConfiguration<T>
     {
         public string Component { get; set; }
         public bool IsTopicPersistent { get; set; }

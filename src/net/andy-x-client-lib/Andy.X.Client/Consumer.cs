@@ -13,11 +13,11 @@ namespace Andy.X.Client
         {
         }
 
-        public Consumer(XClient xClient, ConsumerConfiguration consumerConfiguration) : base(xClient, consumerConfiguration)
+        public Consumer(XClient xClient, ConsumerConfiguration<T> consumerConfiguration) : base(xClient, consumerConfiguration)
         {
         }
 
-        public Consumer(IXClientFactory xClient, ConsumerConfiguration consumerConfiguration) : base(xClient, consumerConfiguration)
+        public Consumer(IXClientFactory xClient, ConsumerConfiguration<T> consumerConfiguration) : base(xClient, consumerConfiguration)
         {
         }
     }

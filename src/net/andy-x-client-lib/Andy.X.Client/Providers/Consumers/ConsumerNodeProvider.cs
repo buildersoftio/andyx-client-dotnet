@@ -9,11 +9,11 @@ namespace Andy.X.Client.Abstractions
         private class ConsumerNodeProvider
         {
             private readonly XClientConfiguration xClientConfig;
-            private readonly ConsumerConfiguration consumerConfig;
+            private readonly ConsumerConfiguration<T> consumerConfig;
 
             private readonly HubConnection _connection;
 
-            public ConsumerNodeProvider(XClientConfiguration xClientConfig, ConsumerConfiguration consumerConfig)
+            public ConsumerNodeProvider(XClientConfiguration xClientConfig, ConsumerConfiguration<T> consumerConfig)
             {
                 this.xClientConfig = xClientConfig;
                 this.consumerConfig = consumerConfig;

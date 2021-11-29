@@ -12,7 +12,7 @@ namespace Andy.X.Client.Abstractions
     public abstract partial class ProducerBase<T>
     {
         private readonly XClient xClient;
-        private readonly ProducerConfiguration producerConfiguration;
+        private readonly ProducerConfiguration<T> producerConfiguration;
         private readonly ILogger logger;
 
         public delegate void OnMessageStoredHandler(object sender, MessageStoredArgs e);
@@ -28,14 +28,14 @@ namespace Andy.X.Client.Abstractions
         public ProducerBase(XClient xClient)
         {
             this.xClient = xClient;
-            producerConfiguration = new ProducerConfiguration();
+            producerConfiguration = new ProducerConfiguration<T>();
 
             logger = this.xClient.GetClientConfiguration()
                 .Logging
                 .GetLoggerFactory()
                 .CreateLogger(typeof(T));
         }
-        public ProducerBase(XClient xClient, ProducerConfiguration producerConfiguration)
+        public ProducerBase(XClient xClient, ProducerConfiguration<T> producerConfiguration)
         {
             this.xClient = xClient;
             this.producerConfiguration = producerConfiguration;
@@ -51,7 +51,7 @@ namespace Andy.X.Client.Abstractions
         public ProducerBase(IXClientFactory xClient)
         {
             this.xClient = xClient.CreateClient();
-            producerConfiguration = new ProducerConfiguration();
+            producerConfiguration = new ProducerConfiguration<T>();
 
             logger = this.xClient.GetClientConfiguration()
                 .Logging
@@ -59,7 +59,7 @@ namespace Andy.X.Client.Abstractions
                 .CreateLogger(typeof(T));
 
         }
-        public ProducerBase(IXClientFactory xClient, ProducerConfiguration producerConfiguration)
+        public ProducerBase(IXClientFactory xClient, ProducerConfiguration<T> producerConfiguration)
         {
             this.xClient = xClient.CreateClient();
             this.producerConfiguration = producerConfiguration;
@@ -173,7 +173,8 @@ namespace Andy.X.Client.Abstractions
                 Product = xClient.GetClientConfiguration().Product,
                 Component = producerConfiguration.Component,
                 Topic = producerConfiguration.Topic,
-                MessageRaw = tObject
+                MessageRaw = tObject,
+                SentDate = DateTime.UtcNow
             };
 
             if (producerNodeService.GetConnectionState() == HubConnectionState.Connected)

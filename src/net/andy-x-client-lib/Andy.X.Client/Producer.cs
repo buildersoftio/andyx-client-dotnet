@@ -13,11 +13,11 @@ namespace Andy.X.Client
         {
         }
 
-        public Producer(XClient xClient, ProducerConfiguration producerConfiguration) : base(xClient, producerConfiguration)
+        public Producer(XClient xClient, ProducerConfiguration<T> producerConfiguration) : base(xClient, producerConfiguration)
         {
         }
 
-        public Producer(IXClientFactory xClient, ProducerConfiguration producerConfiguration) : base(xClient, producerConfiguration)
+        public Producer(IXClientFactory xClient, ProducerConfiguration<T> producerConfiguration) : base(xClient, producerConfiguration)
         {
         }
     }

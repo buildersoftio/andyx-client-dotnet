@@ -9,11 +9,11 @@ namespace Andy.X.Client.Abstractions
         private class ProducerNodeProvider
         {
             private readonly XClientConfiguration xClientConfig;
-            private readonly ProducerConfiguration producerConfig;
+            private readonly ProducerConfiguration<T> producerConfig;
 
             private readonly HubConnection _connection;
 
-            public ProducerNodeProvider(XClientConfiguration xClientConfig, ProducerConfiguration producerConfig)
+            public ProducerNodeProvider(XClientConfiguration xClientConfig, ProducerConfiguration<T> producerConfig)
             {
                 this.xClientConfig = xClientConfig;
                 this.producerConfig = producerConfig;
