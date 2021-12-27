@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using System.Net.Http;
 
 namespace Andy.X.Client.Configurations
 {
@@ -13,6 +14,8 @@ namespace Andy.X.Client.Configurations
 
         public bool AutoConnect { get; set; }
 
+        public HttpClientHandler HttpClientHandler { get; set; }
+
         public XClientLogging Logging { get; set; }
 
         public XClientConfiguration()
@@ -22,6 +25,7 @@ namespace Andy.X.Client.Configurations
             Product = "default";
             AutoConnect = true;
             Logging = new XClientLogging();
+            HttpClientHandler = new HttpClientHandler();
         }
 
         public XClientConfiguration(string serviceUrl)
@@ -31,6 +35,7 @@ namespace Andy.X.Client.Configurations
             Product = "default";
             AutoConnect = true;
             Logging = new XClientLogging();
+            HttpClientHandler = new HttpClientHandler();
         }
     }
 

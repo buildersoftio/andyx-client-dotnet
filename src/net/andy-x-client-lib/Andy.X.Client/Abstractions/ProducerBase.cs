@@ -151,12 +151,12 @@ namespace Andy.X.Client.Abstractions
 
         private void ProducerNodeService_ProducerDisconnected(ProducerDisconnectedArgs obj)
         {
-            logger.LogWarning($"andyx|{obj.Tenant}|{obj.Product}|{obj.Component}|{obj.Topic}|producers#{obj.ProducerName}|{obj.Id}|disconnected");
+            logger.LogWarning($"andyx-client  | Producer '{obj.ProducerName}|{obj.Id}' is disconnected");
         }
 
         private void ProducerNodeService_ProducerConnected(ProducerConnectedArgs obj)
         {
-            logger.LogInformation($"andyx|{obj.Tenant}|{obj.Product}|{obj.Component}|{obj.Topic}|producers#{obj.ProducerName}|{obj.Id}|connected");
+            logger.LogWarning($"andyx-client  | Producer '{obj.ProducerName}|{obj.Id}' is connected");
         }
 
         public Guid Produce(T tObject)
@@ -198,7 +198,7 @@ namespace Andy.X.Client.Abstractions
 
         private void EnqueueMessageToBuffer(TransmitMessageArgs message)
         {
-            logger.LogWarning($"andyx|{message.Tenant}|{message.Product}|{message.Component}|{message.Topic}|producing#msg|{message.Id}|failed#retrying|1 of {producerConfiguration.RetryProducingMessageNTimes}|tries");
+            logger.LogWarning($"andyx-client  | Producing of message '{message.Id}' at {message.Tenant}/{message.Product}/{message.Component}/{message.Topic} failed, retrying 1 of {producerConfiguration.RetryProducingMessageNTimes} tires");
             if (producerConfiguration.RetryProducing == true)
             {
                 unsentMessagesBuffer.Enqueue(new RetryTransmitMessage()
@@ -251,11 +251,10 @@ namespace Andy.X.Client.Abstractions
                     else
                     {
                         // If RetryCounter is bigger than RetryProducerMessageNTimes ignore that message.
-                        logger.LogError($"andyx|{retryTransmitMessage.TransmitMessageArgs.Tenant}|{retryTransmitMessage.TransmitMessageArgs.Product}|" +
-                            $"{retryTransmitMessage.TransmitMessageArgs.Component}|{retryTransmitMessage.TransmitMessageArgs.Topic}|producing#msg|{retryTransmitMessage.TransmitMessageArgs.Id}" +
-                            $"|failed#after {producerConfiguration.RetryProducingMessageNTimes}|tries|message#lost");
+                        logger.LogError($"andyx-client  | Producing of message '{retryTransmitMessage.TransmitMessageArgs.Id}' " +
+                            $"at {retryTransmitMessage.TransmitMessageArgs.Tenant}/{retryTransmitMessage.TransmitMessageArgs.Product}" +
+                            $"/{retryTransmitMessage.TransmitMessageArgs.Component}/{retryTransmitMessage.TransmitMessageArgs.Topic} failed, message is lost");
                     }
-
                 }
             }
             isUnsentMessagesProcessorWorking = false;

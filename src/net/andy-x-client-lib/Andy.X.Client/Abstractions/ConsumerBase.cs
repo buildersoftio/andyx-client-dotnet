@@ -170,12 +170,12 @@ namespace Andy.X.Client.Abstractions
 
         private void ConsumerNodeService_ConsumerDisconnected(ConsumerDisconnectedArgs obj)
         {
-            logger.LogWarning($"andyx|{obj.Tenant}|{obj.Product}|{obj.Component}|{obj.Topic}|consumers#{obj.ConsumerName}|{obj.Id}|disconnected");
+            logger.LogWarning($"andyx-client  | Consumer '{obj.ConsumerName}|{obj.Id}' is disconnected");
         }
 
         private void ConsumerNodeService_ConsumerConnected(ConsumerConnectedArgs obj)
         {
-            logger.LogInformation($"andyx|{obj.Tenant}|{obj.Product}|{obj.Component}|{obj.Topic}|consumers#{obj.ConsumerName}|{obj.Id}|connected");
+            logger.LogWarning($"andyx-client  | Consumer '{obj.ConsumerName}|{obj.Id}' is connected");
 
         }
     }
