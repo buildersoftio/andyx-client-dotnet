@@ -14,7 +14,7 @@
     </Description>
     <RepositoryUrl>https://github.com/buildersoftdev/andyxclient</RepositoryUrl>
     <PackageTags>Andy Streams DDD EDA Event Domain Reactive Streaming Distributed</PackageTags>
-    <Version>2.0.0-rc2</Version>
+    <Version>2.0.0-rc3</Version>
     <PackageLicenseFile>license.md</PackageLicenseFile>
     <PackageIcon>andyX.png</PackageIcon>
     <PackageId>Buildersoft.Andy.X.Client</PackageId>
@@ -75,11 +75,11 @@
   
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="6.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="6.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
-    <PackageReference Include="NJsonSchema" Version="10.5.2" />
-    <PackageReference Include="System.Text.Json" Version="6.0.0" />
+    <PackageReference Include="NJsonSchema" Version="10.6.6" />
+    <PackageReference Include="System.Text.Json" Version="6.0.1" />
   </ItemGroup>
 
   <ItemGroup>

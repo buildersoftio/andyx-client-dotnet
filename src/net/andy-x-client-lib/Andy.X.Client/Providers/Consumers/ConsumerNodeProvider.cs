@@ -23,10 +23,7 @@ namespace Andy.X.Client.Abstractions
                      {
                          option.HttpMessageHandlerFactory = (message) =>
                          {
-                             if (message is HttpClientHandler httpClientHandler)
-                                 httpClientHandler.ServerCertificateCustomValidationCallback +=
-                                     (sender, certificate, chain, sslPolicyErrors) => { return true; };
-                             return message;
+                             return xClientConfig.HttpClientHandler;
                          };
 
                          option.Headers["Authorization"] = $"Bearer {xClientConfig.Token}";

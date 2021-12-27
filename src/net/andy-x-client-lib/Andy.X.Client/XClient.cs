@@ -1,5 +1,7 @@
 ﻿using Andy.X.Client.Configurations;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Net.Http;
 
 namespace Andy.X.Client
 {
@@ -38,6 +40,20 @@ namespace Andy.X.Client
         public XClient Logging(ILoggerFactory loggerFactory)
         {
             xClientConfiguration.Logging = new XClientLogging(loggerFactory);
+            return this;
+        }
+
+        public XClient HttpClientHandler(Action<HttpClientHandler> httpHandler)
+        {
+            httpHandler.Invoke(xClientConfiguration.HttpClientHandler);
+            return this;
+        }
+
+        public XClient SkipSSLCertificates()
+        {
+            xClientConfiguration.HttpClientHandler.ServerCertificateCustomValidationCallback +=
+                    (sender, certificate, chain, sslPolicyErrors) => { return true; };
+
             return this;
         }
 
