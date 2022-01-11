@@ -59,6 +59,12 @@ namespace Andy.X.Client.Abstractions
                 .CreateLogger(typeof(T));
         }
 
+        public ConsumerBase<T> ComponentToken(string componentToken)
+        {
+            consumerConfiguration.ComponentToken = componentToken;
+            return this;
+        }
+
         public ConsumerBase<T> Component(string component)
         {
             consumerConfiguration.Component = component;

@@ -73,6 +73,11 @@ namespace Andy.X.Client.Abstractions
                 unsentMessagesBuffer = new ConcurrentQueue<RetryTransmitMessage>();
         }
 
+        public ProducerBase<T> ComponentToken(string componentToken)
+        {
+            producerConfiguration.ComponentToken = componentToken;
+            return this;
+        }
 
         public ProducerBase<T> Component(string component)
         {
@@ -146,7 +151,7 @@ namespace Andy.X.Client.Abstractions
 
         private void ProducerNodeService_MessageStored(MessageStoredArgs obj)
         {
-            this.MessageStored?.Invoke(this, obj);
+            MessageStored?.Invoke(this, obj);
         }
 
         private void ProducerNodeService_ProducerDisconnected(ProducerDisconnectedArgs obj)

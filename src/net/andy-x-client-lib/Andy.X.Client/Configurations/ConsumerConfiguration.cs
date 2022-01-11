@@ -2,6 +2,7 @@
 {
     public class ConsumerConfiguration<T>
     {
+        public string ComponentToken { get; set; }
         public string Component { get; set; }
         public string Topic { get; set; }
         public string Name { get; set; }

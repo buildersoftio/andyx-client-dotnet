@@ -26,7 +26,9 @@ namespace Andy.X.Client.Abstractions
                              return xClientConfig.HttpClientHandler;
                          };
 
-                         option.Headers["Authorization"] = $"Bearer {xClientConfig.Token}";
+                         option.Headers["x-andyx-tenant-authoriziation"] = xClientConfig.TenantToken;
+                         option.Headers["x-andyx-component-authoriziation"] = consumerConfig.ComponentToken;
+
                          option.Headers["x-andyx-tenant"] = xClientConfig.Tenant;
                          option.Headers["x-andyx-product"] = xClientConfig.Product;
                          option.Headers["x-andyx-component"] = consumerConfig.Component;

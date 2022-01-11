@@ -31,6 +31,12 @@ namespace Andy.X.Client
             return this;
         }
 
+        public XClient TenantToken(string tenantToken)
+        {
+            xClientConfiguration.TenantToken =  tenantToken;
+            return this;
+        }
+
         public XClient AutoConnect(bool autoConnect)
         {
             xClientConfiguration.AutoConnect = autoConnect;

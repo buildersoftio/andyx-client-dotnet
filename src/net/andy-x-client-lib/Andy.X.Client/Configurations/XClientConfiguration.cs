@@ -7,7 +7,7 @@ namespace Andy.X.Client.Configurations
     {
         public string ServiceUrl { get; set; }
 
-        public string Token { get; set; }
+        public string TenantToken { get; set; }
 
         public string Tenant { get; set; }
         public string Product { get; set; }
