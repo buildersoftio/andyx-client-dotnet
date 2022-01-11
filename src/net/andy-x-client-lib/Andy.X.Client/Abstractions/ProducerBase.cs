@@ -73,30 +73,59 @@ namespace Andy.X.Client.Abstractions
                 unsentMessagesBuffer = new ConcurrentQueue<RetryTransmitMessage>();
         }
 
+        /// <summary>
+        /// Component Token, is needed only if the node asks for it
+        /// </summary>
+        /// <param name="componentToken">Component token</param>
+        /// <returns>ProducerBase</returns>
         public ProducerBase<T> ComponentToken(string componentToken)
         {
             producerConfiguration.ComponentToken = componentToken;
             return this;
         }
 
+        /// <summary>
+        /// Component name where producer will produce.
+        /// </summary>
+        /// <param name="component">component name</param>
+        /// <returns>ProducerBase</returns>
         public ProducerBase<T> Component(string component)
         {
             producerConfiguration.Component = component;
             return this;
         }
 
-        public ProducerBase<T> Topic(string topic)
+        /// <summary>
+        /// Topic name where producer will produce messages
+        /// </summary>
+        /// <param name="topic">topic name</param>
+        /// <param name="isTopicPersistent">Is topic persistent flag tells the node to when it creates the topic to be persistent or not. default value is true </param>
+        /// <returns>ProducerBase</returns>
+        public ProducerBase<T> Topic(string topic, bool isTopicPersistent = true)
         {
             producerConfiguration.Topic = topic;
+            producerConfiguration.IsTopicPersistent = isTopicPersistent;
+
             return this;
         }
 
+        /// <summary>
+        /// Name is the producer name, is mandatory field.
+        /// </summary>
+        /// <param name="name">Producer name</param>
+        /// <returns>ProducerBase</returns>
         public ProducerBase<T> Name(string name)
         {
             producerConfiguration.Name = name;
             return this;
         }
 
+        /// <summary>
+        /// Enable or Disable Retrying of messages producing if connection fails
+        /// Default value is False
+        /// </summary>
+        /// <param name="isRetryProducingActive">Enable retry producing</param>
+        /// <returns>ProducerBase</returns>
         public ProducerBase<T> RetryProducing(bool isRetryProducingActive)
         {
             producerConfiguration.RetryProducing = isRetryProducingActive;
@@ -106,19 +135,31 @@ namespace Andy.X.Client.Abstractions
             return this;
         }
 
+        /// <summary>
+        /// Tells the producer how many times to try producing the message
+        /// </summary>
+        /// <param name="nTimesRetry"> int number of tries</param>
+        /// <returns>ProducerBase</returns>
         public ProducerBase<T> RetryProducingMessageNTimes(int nTimesRetry)
         {
             producerConfiguration.RetryProducingMessageNTimes = nTimesRetry;
             return this;
         }
 
-        public async Task<ProducerBase<T>> BuildAsync()
+        /// <summary>
+        /// Build Producer
+        /// </summary>
+        /// <param name="openConnection">default value is true</param>
+        /// <returns>Task of ProducerBase</returns>
+        public async Task<ProducerBase<T>> BuildAsync(bool openConnection = true)
         {
             producerNodeService = new ProducerNodeService(new ProducerNodeProvider(xClient.GetClientConfiguration(), producerConfiguration), xClient.GetClientConfiguration());
             producerNodeService.ProducerConnected += ProducerNodeService_ProducerConnected;
             producerNodeService.ProducerDisconnected += ProducerNodeService_ProducerDisconnected;
             producerNodeService.MessageStored += ProducerNodeService_MessageStored;
-            await producerNodeService.ConnectAsync();
+            if (openConnection == true)
+                await producerNodeService.ConnectAsync();
+
             isConnected = true;
 
             isBuilt = true;
@@ -126,6 +167,21 @@ namespace Andy.X.Client.Abstractions
             return this;
         }
 
+        /// <summary>
+        /// Build Producer
+        /// </summary>
+        /// <param name="openConnection">default value is true</param>
+        /// <returns>ProducerBase</returns>
+        public ProducerBase<T> Build(bool openConnection = true)
+        {
+            return BuildAsync(openConnection).Result;
+        }
+
+        /// <summary>
+        /// Close connection
+        /// </summary>
+        /// <returns>Task</returns>
+        /// <exception cref="Exception">Producer should be built before closing</exception>
         public async Task CloseAsync()
         {
             if (isBuilt != true)
@@ -136,6 +192,13 @@ namespace Andy.X.Client.Abstractions
                 isConnected = false;
             }
         }
+
+        /// <summary>
+        /// Open connection
+        /// </summary>
+        /// <returns>Task</returns>
+        /// <exception cref="Exception">Producer should be built before closing</exception>
+
         public async Task OpenAsync()
         {
             if (isBuilt != true)
@@ -179,7 +242,7 @@ namespace Andy.X.Client.Abstractions
                 Component = producerConfiguration.Component,
                 Topic = producerConfiguration.Topic,
                 MessageRaw = tObject,
-                SentDate = DateTime.UtcNow
+                SentDate = DateTime.UtcNow,
             };
 
             if (producerNodeService.GetConnectionState() == HubConnectionState.Connected)
