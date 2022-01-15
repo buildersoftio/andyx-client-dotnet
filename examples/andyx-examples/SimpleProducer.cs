@@ -8,7 +8,7 @@ namespace andyx_examples
         private readonly Producer<SimpleMessage> producer;
         public SimpleProducer()
         {
-            XClient client = new XClient("https://localhost:9001");
+            XClient client = new XClient("https://localhost:6541");
 
             producer = new Producer<SimpleMessage>(client)
                 .Name("simple-producer")
