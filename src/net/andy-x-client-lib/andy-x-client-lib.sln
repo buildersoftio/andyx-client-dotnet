@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31410.414
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Andy.X.Client", "Andy.X.Client\Andy.X.Client.csproj", "{893472D9-5E72-42F8-8E3D-2177315EFA15}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Andy.X.Client.Extensions.DependencyInjection", "Andy.X.Client.Extensions.DependencyInjection\Andy.X.Client.Extensions.DependencyInjection.csproj", "{861F3D68-ECF0-4419-9AF4-394D17273D66}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{893472D9-5E72-42F8-8E3D-2177315EFA15}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{893472D9-5E72-42F8-8E3D-2177315EFA15}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{893472D9-5E72-42F8-8E3D-2177315EFA15}.Release|Any CPU.Build.0 = Release|Any CPU
+		{861F3D68-ECF0-4419-9AF4-394D17273D66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{861F3D68-ECF0-4419-9AF4-394D17273D66}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{861F3D68-ECF0-4419-9AF4-394D17273D66}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{861F3D68-ECF0-4419-9AF4-394D17273D66}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

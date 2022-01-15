@@ -7,14 +7,14 @@
     <Product>Buildersoft Andy X</Product>
     <Company>Buildersoft</Company>
     <Authors>Buildersoft</Authors>
-    <Copyright>Copyright © Buildersoft 2021</Copyright>
+    <Copyright>Copyright © Buildersoft 2022</Copyright>
     <Description>
       Andy X is an open-source distributed streaming platform designed to deliver the best performance possible for high-performance data pipelines, streaming analytics, streaming between microservices and data integrations.
       This library offers flexible messaging models with high-level APIs for NET.
     </Description>
     <RepositoryUrl>https://github.com/buildersoftdev/andyxclient</RepositoryUrl>
-    <PackageTags>Andy Streams DDD EDA Event Domain Reactive Streaming Distributed</PackageTags>
-    <Version>2.0.0-rc3</Version>
+    <PackageTags>andyx eda streaming distributed</PackageTags>
+    <Version>2.0.0</Version>
     <PackageLicenseFile>license.md</PackageLicenseFile>
     <PackageIcon>andyX.png</PackageIcon>
     <PackageId>Buildersoft.Andy.X.Client</PackageId>
@@ -74,7 +74,6 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="6.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />

@@ -59,36 +59,83 @@ namespace Andy.X.Client.Abstractions
                 .CreateLogger(typeof(T));
         }
 
+        /// <summary>
+        /// Component Token, is needed only if the node asks for it
+        /// </summary>
+        /// <param name="componentToken">Component token</param>
+        /// <returns>ConsumerBase</returns>
+        public ConsumerBase<T> ComponentToken(string componentToken)
+        {
+            consumerConfiguration.ComponentToken = componentToken;
+            return this;
+        }
+
+        /// <summary>
+        /// Component name where consumer will consume.
+        /// </summary>
+        /// <param name="component">component name</param>
+        /// <returns>ConsumerBase</returns>
         public ConsumerBase<T> Component(string component)
         {
             consumerConfiguration.Component = component;
             return this;
         }
 
-        public ConsumerBase<T> Topic(string topic)
+        /// <summary>
+        /// Topic name where consumer will consume messages
+        /// </summary>
+        /// <param name="topic">topic name</param>
+        /// <param name="isTopicPersistent">Is topic persistent flag tells the node to when it creates the topic to be persistent or not. default value is true </param>
+        /// <returns>ConsumerBase</returns>
+        public ConsumerBase<T> Topic(string topic, bool isTopicPersistent = true)
         {
             consumerConfiguration.Topic = topic;
+            consumerConfiguration.IsTopicPersistent = isTopicPersistent;
             return this;
         }
 
+        /// <summary>
+        /// Name is the consumer name, is mandatory field.
+        /// </summary>
+        /// <param name="name">Consumer name</param>
+        /// <returns>ConsumerBase</returns>
         public ConsumerBase<T> Name(string name)
         {
             consumerConfiguration.Name = name;
             return this;
         }
 
+        /// <summary>
+        /// Subscription Type represents how the Consumer consumes messages
+        /// Default value SubscriptionType=Exclusive
+        /// </summary>
+        /// <param name="subscriptionType">Subscription type</param>
+        /// <returns>ConsumerBase</returns>
         public ConsumerBase<T> SubscriptionType(SubscriptionType subscriptionType)
         {
             consumerConfiguration.SubscriptionType = subscriptionType;
             return this;
         }
 
+
+        /// <summary>
+        /// InitialPosition tells the node where to start consuming
+        /// Latest - starts consuming from the moment of connection to topic,
+        /// Earlest - starts consuming from the bigenning.
+        /// Default value is Latest
+        /// </summary>
+        /// <param name="initialPosition">Initial Position</param>
+        /// <returns>ConsumerBase</returns>
         public ConsumerBase<T> InitialPosition(InitialPosition initialPosition)
         {
             consumerConfiguration.InitialPosition = initialPosition;
             return this;
         }
 
+        /// <summary>
+        /// Build Consumer
+        /// </summary>
+        /// <returns>ConsumerBase</returns>
         public ConsumerBase<T> Build()
         {
             consumerNodeService = new ConsumerNodeService(new ConsumerNodeProvider(xClient.GetClientConfiguration(), consumerConfiguration), xClient.GetClientConfiguration());
@@ -101,6 +148,20 @@ namespace Andy.X.Client.Abstractions
             return this;
         }
 
+        /// <summary>
+        /// Build Async
+        /// </summary>
+        /// <returns>Task of ConsumerBase</returns>
+        public Task<ConsumerBase<T>> BuildAsync()
+        {
+            return new Task<ConsumerBase<T>>(Build);
+        }
+
+        /// <summary>
+        /// It will start consuming messages from the topic
+        /// </summary>
+        /// <returns>Task</returns>
+        /// <exception cref="Exception">If consumer is not built before.</exception>
         public async Task SubscribeAsync()
         {
             if (isBuilt != true)
@@ -113,6 +174,11 @@ namespace Andy.X.Client.Abstractions
             }
         }
 
+        /// <summary>
+        /// It will stop consuming of the messages from the topic
+        /// </summary>
+        /// <returns>Task</returns>
+        /// <exception cref="Exception">If consumer is not built before.</exception>
         public async Task UnsubscribeAsync()
         {
             if (isBuilt != true)
@@ -122,6 +188,20 @@ namespace Andy.X.Client.Abstractions
                 await consumerNodeService.DisconnectAsync();
                 isConnected = false;
             }
+        }
+
+        public async Task AcknowledgeMessage(Guid messageId, bool isAcked = true)
+        {
+            await consumerNodeService.AcknowledgeMessage(new AcknowledgeMessageArgs()
+            {
+                Tenant = xClient.GetClientConfiguration().Tenant,
+                Product = xClient.GetClientConfiguration().Product,
+                Component = consumerConfiguration.Component,
+                Topic = consumerConfiguration.Topic,
+                Consumer = consumerConfiguration.Name,
+                IsAcknowledged = isAcked,
+                MessageId = messageId
+            });
         }
 
         private async void ConsumerNodeService_MessageInternalReceived(MessageInternalReceivedArgs obj)
@@ -176,7 +256,6 @@ namespace Andy.X.Client.Abstractions
         private void ConsumerNodeService_ConsumerConnected(ConsumerConnectedArgs obj)
         {
             logger.LogWarning($"andyx-client  | Consumer '{obj.ConsumerName}|{obj.Id}' is connected");
-
         }
     }
 }
