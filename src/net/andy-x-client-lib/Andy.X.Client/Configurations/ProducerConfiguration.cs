@@ -2,6 +2,7 @@
 {
     public class ProducerConfiguration<T>
     {
+        public string ComponentToken { get; set; }
         public string Component { get; set; }
         public bool IsTopicPersistent { get; set; }
         public string Topic { get; set; }

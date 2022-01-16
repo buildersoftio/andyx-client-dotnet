@@ -10,7 +10,7 @@ namespace andyx_examples
         private readonly Consumer<SimpleMessage> consumer;
         public SimpleConsumer()
         {
-            XClient client = new XClient("https://localhost:9001");
+            XClient client = new XClient("https://localhost:6541");
 
             consumer = new Consumer<SimpleMessage>(client)
                 .Name("simple-consumer")

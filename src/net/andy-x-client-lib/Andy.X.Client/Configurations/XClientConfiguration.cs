@@ -7,7 +7,7 @@ namespace Andy.X.Client.Configurations
     {
         public string ServiceUrl { get; set; }
 
-        public string Token { get; set; }
+        public string TenantToken { get; set; }
 
         public string Tenant { get; set; }
         public string Product { get; set; }
@@ -18,6 +18,9 @@ namespace Andy.X.Client.Configurations
 
         public XClientLogging Logging { get; set; }
 
+        /// <summary>
+        /// Initialize XClient
+        /// </summary>
         public XClientConfiguration()
         {
             ServiceUrl = "https://localhost:9001";
@@ -28,6 +31,10 @@ namespace Andy.X.Client.Configurations
             HttpClientHandler = new HttpClientHandler();
         }
 
+        /// <summary>
+        /// Initialize XClient
+        /// </summary>
+        /// <param name="serviceUrl">serviceUrl, default value is https://localhost:9001</param>
         public XClientConfiguration(string serviceUrl)
         {
             ServiceUrl = serviceUrl;
