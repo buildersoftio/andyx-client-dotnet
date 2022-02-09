@@ -11,7 +11,7 @@ namespace Andy.X.Client
 
         /// <summary>
         /// Initialize XClient object
-        /// serviceUrl default value is https://localhost:9001
+        /// serviceUrl default value is https://localhost:6541
         /// </summary>
         /// <param name="xClientConfiguration">xClient Configuration</param>
         public XClient(XClientConfiguration xClientConfiguration)

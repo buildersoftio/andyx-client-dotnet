@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Andy.X.Client.Abstractions
 {
@@ -13,6 +14,7 @@ namespace Andy.X.Client.Abstractions
 
             public Guid Id { get; set; }
             public object MessageRaw { get; set; }
+            public Dictionary<string, object> Headers { get; set; }
 
             public DateTime SentDate { get; set; }
         }

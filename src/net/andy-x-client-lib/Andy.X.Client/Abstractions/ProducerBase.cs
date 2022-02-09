@@ -6,14 +6,15 @@ using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using System.Threading;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 
 namespace Andy.X.Client.Abstractions
 {
     public abstract partial class ProducerBase<T>
     {
-        private readonly XClient xClient;
-        private readonly ProducerConfiguration<T> producerConfiguration;
-        private readonly ILogger logger;
+        private readonly XClient _xClient;
+        private readonly ProducerConfiguration<T> _producerConfiguration;
+        private readonly ILogger _logger;
 
         public delegate void OnMessageStoredHandler(object sender, MessageStoredArgs e);
         public event OnMessageStoredHandler MessageStored;
@@ -25,53 +26,38 @@ namespace Andy.X.Client.Abstractions
         private ConcurrentQueue<RetryTransmitMessage> unsentMessagesBuffer;
         private bool isUnsentMessagesProcessorWorking = false;
 
-        public ProducerBase(XClient xClient)
-        {
-            this.xClient = xClient;
-            producerConfiguration = new ProducerConfiguration<T>();
+        private Dictionary<string, object> defaultHeaders;
 
-            logger = this.xClient.GetClientConfiguration()
-                .Logging
-                .GetLoggerFactory()
-                .CreateLogger(typeof(T));
+        public ProducerBase(XClient xClient) : this(xClient, new ProducerConfiguration<T>())
+        {
+
         }
+
+        public ProducerBase(IXClientFactory xClient) : this(xClient.CreateClient(), new ProducerConfiguration<T>())
+        {
+
+        }
+        public ProducerBase(IXClientFactory xClient, ProducerConfiguration<T> producerConfiguration) : this(xClient.CreateClient(), producerConfiguration)
+        {
+
+        }
+
         public ProducerBase(XClient xClient, ProducerConfiguration<T> producerConfiguration)
         {
-            this.xClient = xClient;
-            this.producerConfiguration = producerConfiguration;
+            _xClient = xClient;
+            _producerConfiguration = producerConfiguration;
 
-            logger = this.xClient.GetClientConfiguration()
+            _logger = _xClient.GetClientConfiguration()
                 .Logging
                 .GetLoggerFactory()
                 .CreateLogger(typeof(T));
 
             if (producerConfiguration.RetryProducing == true)
                 unsentMessagesBuffer = new ConcurrentQueue<RetryTransmitMessage>();
+
+            defaultHeaders = new Dictionary<string, object>();
         }
-        public ProducerBase(IXClientFactory xClient)
-        {
-            this.xClient = xClient.CreateClient();
-            producerConfiguration = new ProducerConfiguration<T>();
 
-            logger = this.xClient.GetClientConfiguration()
-                .Logging
-                .GetLoggerFactory()
-                .CreateLogger(typeof(T));
-
-        }
-        public ProducerBase(IXClientFactory xClient, ProducerConfiguration<T> producerConfiguration)
-        {
-            this.xClient = xClient.CreateClient();
-            this.producerConfiguration = producerConfiguration;
-
-            logger = this.xClient.GetClientConfiguration()
-                .Logging
-                .GetLoggerFactory()
-                .CreateLogger(typeof(T));
-
-            if (producerConfiguration.RetryProducing == true)
-                unsentMessagesBuffer = new ConcurrentQueue<RetryTransmitMessage>();
-        }
 
         /// <summary>
         /// Component Token, is needed only if the node asks for it
@@ -80,7 +66,7 @@ namespace Andy.X.Client.Abstractions
         /// <returns>ProducerBase</returns>
         public ProducerBase<T> ComponentToken(string componentToken)
         {
-            producerConfiguration.ComponentToken = componentToken;
+            _producerConfiguration.ComponentToken = componentToken;
             return this;
         }
 
@@ -91,7 +77,7 @@ namespace Andy.X.Client.Abstractions
         /// <returns>ProducerBase</returns>
         public ProducerBase<T> Component(string component)
         {
-            producerConfiguration.Component = component;
+            _producerConfiguration.Component = component;
             return this;
         }
 
@@ -103,8 +89,8 @@ namespace Andy.X.Client.Abstractions
         /// <returns>ProducerBase</returns>
         public ProducerBase<T> Topic(string topic, bool isTopicPersistent = true)
         {
-            producerConfiguration.Topic = topic;
-            producerConfiguration.IsTopicPersistent = isTopicPersistent;
+            _producerConfiguration.Topic = topic;
+            _producerConfiguration.IsTopicPersistent = isTopicPersistent;
 
             return this;
         }
@@ -116,7 +102,7 @@ namespace Andy.X.Client.Abstractions
         /// <returns>ProducerBase</returns>
         public ProducerBase<T> Name(string name)
         {
-            producerConfiguration.Name = name;
+            _producerConfiguration.Name = name;
             return this;
         }
 
@@ -128,10 +114,36 @@ namespace Andy.X.Client.Abstractions
         /// <returns>ProducerBase</returns>
         public ProducerBase<T> RetryProducing(bool isRetryProducingActive)
         {
-            producerConfiguration.RetryProducing = isRetryProducingActive;
+            _producerConfiguration.RetryProducing = isRetryProducingActive;
             if (isRetryProducingActive == true)
                 unsentMessagesBuffer = new ConcurrentQueue<RetryTransmitMessage>();
 
+            return this;
+        }
+
+        /// <summary>
+        /// Add Headers to the Producer, these headers will be transmitted with each message
+        /// </summary>
+        /// <param name="key">string header key</param>
+        /// <param name="value">object type value</param>
+        /// <returns>this</returns>
+        public ProducerBase<T> AddDefaultHeader(string key, object value)
+        {
+            defaultHeaders.Add(key, value);
+            return this;
+        }
+
+        /// <summary>
+        /// Add Headers to the Producer, these headers will be transmitted with each message
+        /// </summary>
+        /// <param name="headers">Keyvaluepairs headers</param>
+        /// <returns></returns>
+        public ProducerBase<T> AddDefaultHeader(Dictionary<string, object> headers)
+        {
+            foreach (var header in headers)
+            {
+                defaultHeaders.Add(header.Key, header.Value);
+            }
             return this;
         }
 
@@ -142,7 +154,7 @@ namespace Andy.X.Client.Abstractions
         /// <returns>ProducerBase</returns>
         public ProducerBase<T> RetryProducingMessageNTimes(int nTimesRetry)
         {
-            producerConfiguration.RetryProducingMessageNTimes = nTimesRetry;
+            _producerConfiguration.RetryProducingMessageNTimes = nTimesRetry;
             return this;
         }
 
@@ -153,7 +165,12 @@ namespace Andy.X.Client.Abstractions
         /// <returns>Task of ProducerBase</returns>
         public async Task<ProducerBase<T>> BuildAsync(bool openConnection = true)
         {
-            producerNodeService = new ProducerNodeService(new ProducerNodeProvider(xClient.GetClientConfiguration(), producerConfiguration), xClient.GetClientConfiguration());
+            // Add default headers
+            defaultHeaders.Add("x-client", "Andy X Client v2.1.0");
+            defaultHeaders.Add("x-produced-from", _producerConfiguration.Name);
+            defaultHeaders.Add("x-content-type", "application/json");
+
+            producerNodeService = new ProducerNodeService(new ProducerNodeProvider(_xClient.GetClientConfiguration(), _producerConfiguration), _xClient.GetClientConfiguration());
             producerNodeService.ProducerConnected += ProducerNodeService_ProducerConnected;
             producerNodeService.ProducerDisconnected += ProducerNodeService_ProducerDisconnected;
             producerNodeService.MessageStored += ProducerNodeService_MessageStored;
@@ -161,7 +178,6 @@ namespace Andy.X.Client.Abstractions
                 await producerNodeService.ConnectAsync();
 
             isConnected = true;
-
             isBuilt = true;
 
             return this;
@@ -219,29 +235,33 @@ namespace Andy.X.Client.Abstractions
 
         private void ProducerNodeService_ProducerDisconnected(ProducerDisconnectedArgs obj)
         {
-            logger.LogWarning($"andyx-client  | Producer '{obj.ProducerName}|{obj.Id}' is disconnected");
+            _logger.LogWarning($"andyx-client  | Producer '{obj.ProducerName}|{obj.Id}' is disconnected");
         }
 
         private void ProducerNodeService_ProducerConnected(ProducerConnectedArgs obj)
         {
-            logger.LogWarning($"andyx-client  | Producer '{obj.ProducerName}|{obj.Id}' is connected");
+            _logger.LogWarning($"andyx-client  | Producer '{obj.ProducerName}|{obj.Id}' is connected");
         }
 
-        public Guid Produce(T tObject)
+        public Guid Produce(T tObject, Dictionary<string, object> headers = null)
         {
-            return ProduceAsync(tObject).Result;
+            return ProduceAsync(tObject, headers).Result;
         }
 
-        public async Task<Guid> ProduceAsync(T tObject)
+        public async Task<Guid> ProduceAsync(T tObject, Dictionary<string, object> headers = null)
         {
+
+            headers = AddDefaultHeaderIntoMessage(headers);
+
             var message = new TransmitMessageArgs()
             {
                 Id = Guid.NewGuid(),
-                Tenant = xClient.GetClientConfiguration().Tenant,
-                Product = xClient.GetClientConfiguration().Product,
-                Component = producerConfiguration.Component,
-                Topic = producerConfiguration.Topic,
+                Tenant = _xClient.GetClientConfiguration().Tenant,
+                Product = _xClient.GetClientConfiguration().Product,
+                Component = _producerConfiguration.Component,
+                Topic = _producerConfiguration.Topic,
                 MessageRaw = tObject,
+                Headers = headers,
                 SentDate = DateTime.UtcNow,
             };
 
@@ -264,10 +284,22 @@ namespace Andy.X.Client.Abstractions
             return message.Id;
         }
 
+        private Dictionary<string, object> AddDefaultHeaderIntoMessage(Dictionary<string, object> headers)
+        {
+            if (headers == null)
+                headers = new Dictionary<string, object>();
+
+            foreach (var defaultHeader in defaultHeaders)
+            {
+                headers.Add(defaultHeader.Key, headers.Values);
+            }
+            return headers;
+        }
+
         private void EnqueueMessageToBuffer(TransmitMessageArgs message)
         {
-            logger.LogWarning($"andyx-client  | Producing of message '{message.Id}' at {message.Tenant}/{message.Product}/{message.Component}/{message.Topic} failed, retrying 1 of {producerConfiguration.RetryProducingMessageNTimes} tires");
-            if (producerConfiguration.RetryProducing == true)
+            _logger.LogWarning($"andyx-client  | Producing of message '{message.Id}' at {message.Tenant}/{message.Product}/{message.Component}/{message.Topic} failed, retrying 1 of {_producerConfiguration.RetryProducingMessageNTimes} tires");
+            if (_producerConfiguration.RetryProducing == true)
             {
                 unsentMessagesBuffer.Enqueue(new RetryTransmitMessage()
                 {
@@ -298,7 +330,7 @@ namespace Andy.X.Client.Abstractions
                 bool isMessageReturned = unsentMessagesBuffer.TryDequeue(out retryTransmitMessage);
                 if (isMessageReturned == true)
                 {
-                    if (retryTransmitMessage.RetryCounter < producerConfiguration.RetryProducingMessageNTimes)
+                    if (retryTransmitMessage.RetryCounter < _producerConfiguration.RetryProducingMessageNTimes)
                     {
                         retryTransmitMessage.RetryCounter++;
 
@@ -319,7 +351,7 @@ namespace Andy.X.Client.Abstractions
                     else
                     {
                         // If RetryCounter is bigger than RetryProducerMessageNTimes ignore that message.
-                        logger.LogError($"andyx-client  | Producing of message '{retryTransmitMessage.TransmitMessageArgs.Id}' " +
+                        _logger.LogError($"andyx-client  | Producing of message '{retryTransmitMessage.TransmitMessageArgs.Id}' " +
                             $"at {retryTransmitMessage.TransmitMessageArgs.Tenant}/{retryTransmitMessage.TransmitMessageArgs.Product}" +
                             $"/{retryTransmitMessage.TransmitMessageArgs.Component}/{retryTransmitMessage.TransmitMessageArgs.Topic} failed, message is lost");
                     }
