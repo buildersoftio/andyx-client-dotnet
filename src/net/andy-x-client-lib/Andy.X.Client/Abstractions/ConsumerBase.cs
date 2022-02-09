@@ -21,38 +21,25 @@ namespace Andy.X.Client.Abstractions
         private bool isBuilt = false;
         private bool isConnected = false;
 
-        public ConsumerBase(XClient xClient)
+        public ConsumerBase(XClient xClient) : this(xClient, new ConsumerConfiguration<T>())
         {
-            this.xClient = xClient;
-            consumerConfiguration = new ConsumerConfiguration<T>();
-            logger = this.xClient.GetClientConfiguration()
-                .Logging
-                .GetLoggerFactory()
-                .CreateLogger(typeof(T));
+
         }
+
+        public ConsumerBase(IXClientFactory xClient) : this(xClient.CreateClient(), new ConsumerConfiguration<T>())
+        {
+
+        }
+
+        public ConsumerBase(IXClientFactory xClient, ConsumerConfiguration<T> consumerConfiguration) : this(xClient.CreateClient(), consumerConfiguration)
+        {
+
+        }
+
         public ConsumerBase(XClient xClient, ConsumerConfiguration<T> consumerConfiguration)
         {
             this.xClient = xClient;
             this.consumerConfiguration = consumerConfiguration;
-            logger = this.xClient.GetClientConfiguration()
-                .Logging
-                .GetLoggerFactory()
-                .CreateLogger(typeof(T));
-        }
-        public ConsumerBase(IXClientFactory xClient)
-        {
-            this.xClient = xClient.CreateClient();
-
-            logger = this.xClient.GetClientConfiguration()
-                .Logging
-                .GetLoggerFactory()
-                .CreateLogger(typeof(T));
-        }
-        public ConsumerBase(IXClientFactory xClient, ConsumerConfiguration<T> consumerConfiguration)
-        {
-            this.xClient = xClient.CreateClient();
-            this.consumerConfiguration = consumerConfiguration;
-
             logger = this.xClient.GetClientConfiguration()
                 .Logging
                 .GetLoggerFactory()
@@ -209,7 +196,15 @@ namespace Andy.X.Client.Abstractions
             T parsedPayload = obj.MessageRaw.ToJson().TryJsonToObject<T>();
             try
             {
-                bool? isMessageAcknowledged = MessageReceived?.Invoke(this, new MessageReceivedArgs<T>(obj.Tenant, obj.Product, obj.Component, obj.Topic, obj.Id, obj.MessageRaw, parsedPayload, obj.SentDate));
+                bool? isMessageAcknowledged = MessageReceived?.Invoke(this, new MessageReceivedArgs<T>(obj.Tenant,
+                    obj.Product,
+                    obj.Component,
+                    obj.Topic,
+                    obj.Id,
+                    obj.Headers,
+                    obj.MessageRaw,
+                    parsedPayload,
+                    obj.SentDate));
 
                 // Ignore acknowlegment of message is topic is not persistent
                 if (consumerConfiguration.IsTopicPersistent != true)

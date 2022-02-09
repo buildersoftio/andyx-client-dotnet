@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Andy.X.Client.Events.Consumers
 {
@@ -11,7 +12,8 @@ namespace Andy.X.Client.Events.Consumers
 
         public Guid MessageId { get; private set; }
 
-        //
+        public Dictionary<string, object> Headers{ get; set; }
+
         // Summary:
         //     Gets the message data as a System.Object.
         public object Payload { get; private set; }
@@ -22,7 +24,7 @@ namespace Andy.X.Client.Events.Consumers
 
 
 
-        public MessageReceivedArgs(string tenant, string product, string component, string topic, Guid messageId, object payload, T genericPayload, DateTime sentDate)
+        public MessageReceivedArgs(string tenant, string product, string component, string topic, Guid messageId, Dictionary<string, object> headers, object payload, T genericPayload, DateTime sentDate)
         {
             Tenant = tenant;
             Product = product;
@@ -30,6 +32,7 @@ namespace Andy.X.Client.Events.Consumers
             Topic = topic;
 
             MessageId = messageId;
+            Headers = headers;
             Payload = payload;
             GenericPayload = genericPayload;
 

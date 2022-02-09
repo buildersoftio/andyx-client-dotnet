@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFrameworks>net6.0;net5;netcoreapp3.1;netstandard2.1;netstandard2.0</TargetFrameworks>
-    <AssemblyVersion>2.0.0</AssemblyVersion>
-    <FileVersion>2.0.0</FileVersion>
+    <AssemblyVersion>2.1.0</AssemblyVersion>
+    <FileVersion>2.1.0</FileVersion>
     <Product>Buildersoft Andy X</Product>
     <Company>Buildersoft</Company>
     <Authors>Buildersoft</Authors>
@@ -14,7 +14,7 @@
     </Description>
     <RepositoryUrl>https://github.com/buildersoftdev/andyxclient</RepositoryUrl>
     <PackageTags>andyx eda streaming distributed</PackageTags>
-    <Version>2.0.0</Version>
+    <Version>2.1.0</Version>
     <PackageLicenseFile>license.md</PackageLicenseFile>
     <PackageIcon>andyX.png</PackageIcon>
     <PackageId>Buildersoft.Andy.X.Client</PackageId>
@@ -74,11 +74,11 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="6.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="6.0.2" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
-    <PackageReference Include="NJsonSchema" Version="10.6.6" />
-    <PackageReference Include="System.Text.Json" Version="6.0.1" />
+    <PackageReference Include="NJsonSchema" Version="10.6.7" />
+    <PackageReference Include="System.Text.Json" Version="6.0.2" />
   </ItemGroup>
 
   <ItemGroup>
