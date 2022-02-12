@@ -166,7 +166,7 @@ namespace Andy.X.Client.Abstractions
         public async Task<ProducerBase<T>> BuildAsync(bool openConnection = true)
         {
             // Add default headers
-            defaultHeaders.Add("x-client", "Andy X Client v2.1.0");
+            defaultHeaders.Add("x-client", "Andy X Client v2.1.1");
             defaultHeaders.Add("x-produced-from", _producerConfiguration.Name);
             defaultHeaders.Add("x-content-type", "application/json");
 
@@ -291,7 +291,7 @@ namespace Andy.X.Client.Abstractions
 
             foreach (var defaultHeader in defaultHeaders)
             {
-                headers.Add(defaultHeader.Key, headers.Values);
+                headers.Add(defaultHeader.Key, defaultHeader.Value);
             }
             return headers;
         }
