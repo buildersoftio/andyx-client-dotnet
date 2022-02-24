@@ -1,4 +1,5 @@
-﻿using Andy.X.Client.Configurations;
+﻿using Andy.X.Client.Builders;
+using Andy.X.Client.Configurations;
 using Andy.X.Client.Events.Consumers;
 using Andy.X.Client.Extensions;
 using Microsoft.Extensions.Logging;
@@ -32,6 +33,11 @@ namespace Andy.X.Client.Abstractions
         }
 
         public ConsumerBase(IXClientFactory xClient, ConsumerConfiguration<T> consumerConfiguration) : this(xClient.CreateClient(), consumerConfiguration)
+        {
+
+        }
+
+        public ConsumerBase(IXClientFactory xClient, ConsumerBuilder<T> consumerBuilder) : this(xClient.CreateClient(), consumerBuilder.ConsumerConfiguration)
         {
 
         }
@@ -123,7 +129,7 @@ namespace Andy.X.Client.Abstractions
         /// Build Consumer
         /// </summary>
         /// <returns>ConsumerBase</returns>
-        public ConsumerBase<T> Build()
+        public Consumer<T> Build()
         {
             consumerNodeService = new ConsumerNodeService(new ConsumerNodeProvider(xClient.GetClientConfiguration(), consumerConfiguration), xClient.GetClientConfiguration());
             consumerNodeService.ConsumerConnected += ConsumerNodeService_ConsumerConnected;
@@ -132,16 +138,16 @@ namespace Andy.X.Client.Abstractions
 
             isBuilt = true;
 
-            return this;
+            return this as Consumer<T>;
         }
 
         /// <summary>
         /// Build Async
         /// </summary>
         /// <returns>Task of ConsumerBase</returns>
-        public Task<ConsumerBase<T>> BuildAsync()
+        public Task<Consumer<T>> BuildAsync()
         {
-            return new Task<ConsumerBase<T>>(Build);
+            return new Task<Consumer<T>>(Build);
         }
 
         /// <summary>

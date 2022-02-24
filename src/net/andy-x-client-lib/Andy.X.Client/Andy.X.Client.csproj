@@ -2,8 +2,8 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>net6.0;net5;netcoreapp3.1;netstandard2.1;netstandard2.0</TargetFrameworks>
-		<AssemblyVersion>2.1.1</AssemblyVersion>
-		<FileVersion>2.1.1</FileVersion>
+		<AssemblyVersion>2.1.2</AssemblyVersion>
+		<FileVersion>2.1.2</FileVersion>
 		<Product>Buildersoft Andy X</Product>
 		<Company>Buildersoft</Company>
 		<Authors>Buildersoft</Authors>
@@ -14,7 +14,7 @@
 		</Description>
 		<RepositoryUrl>https://github.com/buildersoftdev/andyxclient</RepositoryUrl>
 		<PackageTags>andyx eda streaming distributed</PackageTags>
-		<Version>2.1.1-preview</Version>
+		<Version>2.1.2-preview</Version>
 		<PackageLicenseFile>license.md</PackageLicenseFile>
 		<PackageIcon>andyX.png</PackageIcon>
 		<PackageId>Buildersoft.Andy.X.Client</PackageId>

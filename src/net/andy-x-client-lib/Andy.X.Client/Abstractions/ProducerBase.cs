@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using Andy.X.Client.Builders;
 
 namespace Andy.X.Client.Abstractions
 {
@@ -38,6 +39,11 @@ namespace Andy.X.Client.Abstractions
 
         }
         public ProducerBase(IXClientFactory xClient, ProducerConfiguration<T> producerConfiguration) : this(xClient.CreateClient(), producerConfiguration)
+        {
+
+        }
+
+        public ProducerBase(IXClientFactory xClient, ProducerBuilder<T> producerBuilder) : this(xClient.CreateClient(), producerBuilder.ProducerConfiguration)
         {
 
         }
@@ -163,12 +169,13 @@ namespace Andy.X.Client.Abstractions
         /// </summary>
         /// <param name="openConnection">default value is true</param>
         /// <returns>Task of ProducerBase</returns>
-        public async Task<ProducerBase<T>> BuildAsync(bool openConnection = true)
+        public async Task<Producer<T>> BuildAsync(bool openConnection = true)
         {
             // Add default headers
-            defaultHeaders.Add("x-client", "Andy X Client v2.1.1");
-            defaultHeaders.Add("x-produced-from", _producerConfiguration.Name);
-            defaultHeaders.Add("x-content-type", "application/json");
+            defaultHeaders.Add("andyx-client", "Andy X Client for .NET");
+            defaultHeaders.Add("andyx-client-version", "v2.1.2-preview");
+            defaultHeaders.Add("andyx-producer-name", _producerConfiguration.Name);
+            defaultHeaders.Add("andyx-content-type", "application/json");
 
             producerNodeService = new ProducerNodeService(new ProducerNodeProvider(_xClient.GetClientConfiguration(), _producerConfiguration), _xClient.GetClientConfiguration());
             producerNodeService.ProducerConnected += ProducerNodeService_ProducerConnected;
@@ -180,7 +187,7 @@ namespace Andy.X.Client.Abstractions
             isConnected = true;
             isBuilt = true;
 
-            return this;
+            return this as Producer<T>;
         }
 
         /// <summary>
@@ -188,7 +195,7 @@ namespace Andy.X.Client.Abstractions
         /// </summary>
         /// <param name="openConnection">default value is true</param>
         /// <returns>ProducerBase</returns>
-        public ProducerBase<T> Build(bool openConnection = true)
+        public Producer<T> Build(bool openConnection = true)
         {
             return BuildAsync(openConnection).Result;
         }

@@ -1,9 +1,10 @@
 ﻿using Andy.X.Client.Abstractions;
+using Andy.X.Client.Builders;
 using Andy.X.Client.Configurations;
 
 namespace Andy.X.Client
 {
-    public class Producer<T> : ProducerBase<T>
+    public class Producer<T> : ProducerBase<T>, IProducer<T>
     {
         public Producer(XClient xClient) : base(xClient)
         {
@@ -18,6 +19,10 @@ namespace Andy.X.Client
         }
 
         public Producer(IXClientFactory xClient, ProducerConfiguration<T> producerConfiguration) : base(xClient, producerConfiguration)
+        {
+        }
+
+        public Producer(IXClientFactory xClient, ProducerBuilder<T> producerBuilder) : base(xClient, producerBuilder)
         {
         }
     }
