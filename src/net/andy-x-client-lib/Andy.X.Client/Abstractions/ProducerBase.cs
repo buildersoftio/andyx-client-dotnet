@@ -144,7 +144,7 @@ namespace Andy.X.Client.Abstractions
         /// </summary>
         /// <param name="headers">Keyvaluepairs headers</param>
         /// <returns></returns>
-        public ProducerBase<T> AddDefaultHeader(Dictionary<string, object> headers)
+        public ProducerBase<T> AddDefaultHeader(IDictionary<string, object> headers)
         {
             foreach (var header in headers)
             {
@@ -255,19 +255,67 @@ namespace Andy.X.Client.Abstractions
             return ProduceAsync(tObject, headers).Result;
         }
 
-        public async Task<Guid> ProduceAsync(T tObject, Dictionary<string, object> headers = null)
+        public List<Guid> Produce(IList<T> messages, Dictionary<string, object> headers = null)
         {
+            return ProduceAsync(messages, headers).Result;
+        }
 
+        public async Task<List<Guid>> ProduceAsync(IList<T> messages, Dictionary<string, object> headers = null)
+        {
+            headers = AddDefaultHeaderIntoMessage(headers);
+            var ids = new List<Guid>();
+            var messagesArgs = new List<TransmitMessageArgs>();
+            foreach (var msg in messages)
+            {
+                Guid id = Guid.NewGuid();
+                messagesArgs.Add(new TransmitMessageArgs()
+                {
+                    Id = id,
+                    Tenant = _xClient.GetClientConfiguration().Tenant,
+                    Product = _xClient.GetClientConfiguration().Product,
+                    Component = _producerConfiguration.Component,
+                    Topic = _producerConfiguration.Topic,
+                    MessageRaw = msg,
+                    Headers = headers,
+                    SentDate = DateTime.UtcNow,
+                });
+                ids.Add(id);
+            }
+
+            if (producerNodeService.GetConnectionState() == HubConnectionState.Connected)
+            {
+                try
+                {
+                    await producerNodeService.TransmitMessages(messagesArgs);
+                    return ids;
+                }
+                catch (Exception)
+                {
+                    // moved the code to the end of method.
+                }
+            }
+
+            // Messages are not send
+            messagesArgs.ForEach(x =>
+            {
+                EnqueueMessageToBuffer(x);
+            });
+
+            return new List<Guid>();
+        }
+
+        public async Task<Guid> ProduceAsync(T message, Dictionary<string, object> headers = null)
+        {
             headers = AddDefaultHeaderIntoMessage(headers);
 
-            var message = new TransmitMessageArgs()
+            var messageArgs = new TransmitMessageArgs()
             {
                 Id = Guid.NewGuid(),
                 Tenant = _xClient.GetClientConfiguration().Tenant,
                 Product = _xClient.GetClientConfiguration().Product,
                 Component = _producerConfiguration.Component,
                 Topic = _producerConfiguration.Topic,
-                MessageRaw = tObject,
+                MessageRaw = message,
                 Headers = headers,
                 SentDate = DateTime.UtcNow,
             };
@@ -276,19 +324,17 @@ namespace Andy.X.Client.Abstractions
             {
                 try
                 {
-                    await producerNodeService.TransmitMessage(message);
+                    await producerNodeService.TransmitMessage(messageArgs);
+                    return messageArgs.Id;
                 }
                 catch (Exception)
                 {
-                    EnqueueMessageToBuffer(message);
+                    // moved the code to the end of method.
                 }
             }
-            else
-            {
-                EnqueueMessageToBuffer(message);
-            }
 
-            return message.Id;
+            EnqueueMessageToBuffer(messageArgs);
+            return Guid.Empty;
         }
 
         private Dictionary<string, object> AddDefaultHeaderIntoMessage(Dictionary<string, object> headers)
