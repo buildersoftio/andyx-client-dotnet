@@ -2,6 +2,7 @@
 using Andy.X.Client.Events.Producers;
 using Microsoft.AspNetCore.SignalR.Client;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -61,6 +62,11 @@ namespace Andy.X.Client.Abstractions
             public async Task TransmitMessage(TransmitMessageArgs transmitMessageArgs)
             {
                 await _connection.SendAsync("TransmitMessage", transmitMessageArgs);
+            }
+
+            public async Task TransmitMessages(List<TransmitMessageArgs> transmitMessageArgs)
+            {
+                await _connection.SendAsync("TransmitMessages", transmitMessageArgs);
             }
 
             public HubConnectionState GetConnectionState()

@@ -2,8 +2,8 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>net6.0;net5;netcoreapp3.1;netstandard2.1;netstandard2.0</TargetFrameworks>
-		<AssemblyVersion>2.1.2</AssemblyVersion>
-		<FileVersion>2.1.2</FileVersion>
+		<AssemblyVersion>2.1.3</AssemblyVersion>
+		<FileVersion>2.1.3</FileVersion>
 		<Product>Buildersoft Andy X</Product>
 		<Company>Buildersoft</Company>
 		<Authors>Buildersoft</Authors>
@@ -14,7 +14,7 @@
 		</Description>
 		<RepositoryUrl>https://github.com/buildersoftdev/andyxclient</RepositoryUrl>
 		<PackageTags>andyx eda streaming distributed</PackageTags>
-		<Version>2.1.2-preview</Version>
+		<Version>2.1.3-preview</Version>
 		<PackageLicenseFile>license.md</PackageLicenseFile>
 		<PackageIcon>andyX.png</PackageIcon>
 		<PackageId>Buildersoft.Andy.X.Client</PackageId>
@@ -23,6 +23,7 @@
 		<IsPublishable>True</IsPublishable>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 		<RepositoryType></RepositoryType>
+		<PackageReleaseNotes>In this version we added support for Bulk Producing</PackageReleaseNotes>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0|AnyCPU'">
