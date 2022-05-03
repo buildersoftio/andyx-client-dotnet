@@ -1,6 +1,5 @@
 ﻿using Andy.X.Client.Configurations;
 using Microsoft.AspNetCore.SignalR.Client;
-using System.Net.Http;
 
 namespace Andy.X.Client.Abstractions
 {
