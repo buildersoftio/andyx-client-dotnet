@@ -12,7 +12,7 @@
 		</Description>
 		<RepositoryUrl>https://github.com/buildersoftdev/andyxclient</RepositoryUrl>
 		<PackageTags>andyx eda streaming distributed</PackageTags>
-		<Version>2.1.5-preview</Version>
+		<Version>2.1.6-preview</Version>
 		<PackageLicenseFile>license.md</PackageLicenseFile>
 		<PackageIcon>andyX.png</PackageIcon>
 		<PackageId>Andy.X.Client.Extensions.Microsoft.DependencyInjection</PackageId>

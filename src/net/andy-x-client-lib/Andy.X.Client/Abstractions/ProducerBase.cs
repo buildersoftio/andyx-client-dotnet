@@ -413,8 +413,7 @@ namespace Andy.X.Client.Abstractions
             producerNodeService.ProducerDisconnected += ProducerNodeService_ProducerDisconnected;
             producerNodeService.MessageStored += ProducerNodeService_MessageStored;
 
-
-            isConnected = true;
+            isConnected = false;
             isBuilt = true;
 
             return this as Producer<T>;
