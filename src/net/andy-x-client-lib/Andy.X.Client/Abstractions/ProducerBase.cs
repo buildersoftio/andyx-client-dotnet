@@ -6,14 +6,21 @@ using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using System.Threading;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
+using Andy.X.Client.Builders;
+using Andy.X.Client.Abstractions.Producers;
 
 namespace Andy.X.Client.Abstractions
 {
-    public abstract partial class ProducerBase<T>
+    public abstract partial class ProducerBase<T> :
+        IProducerComponentConnection<T>,
+        IProducerTopicConnection<T>,
+        IProducerNameConnection<T>,
+        IProducerOtherConfiguration<T>
     {
-        private readonly XClient xClient;
-        private readonly ProducerConfiguration<T> producerConfiguration;
-        private readonly ILogger logger;
+        private readonly XClient _xClient;
+        private readonly ProducerConfiguration<T> _producerConfiguration;
+        private readonly ILogger _logger;
 
         public delegate void OnMessageStoredHandler(object sender, MessageStoredArgs e);
         public event OnMessageStoredHandler MessageStored;
@@ -25,156 +32,41 @@ namespace Andy.X.Client.Abstractions
         private ConcurrentQueue<RetryTransmitMessage> unsentMessagesBuffer;
         private bool isUnsentMessagesProcessorWorking = false;
 
-        public ProducerBase(XClient xClient)
-        {
-            this.xClient = xClient;
-            producerConfiguration = new ProducerConfiguration<T>();
+        private Dictionary<string, object> defaultHeaders;
 
-            logger = this.xClient.GetClientConfiguration()
-                .Logging
-                .GetLoggerFactory()
-                .CreateLogger(typeof(T));
+        public ProducerBase(XClient xClient) : this(xClient, new ProducerConfiguration<T>())
+        {
+
         }
+
+        public ProducerBase(IXClientFactory xClient) : this(xClient.CreateClient(), new ProducerConfiguration<T>())
+        {
+
+        }
+        public ProducerBase(IXClientFactory xClient, ProducerConfiguration<T> producerConfiguration) : this(xClient.CreateClient(), producerConfiguration)
+        {
+
+        }
+
+        public ProducerBase(IXClientFactory xClient, ProducerBuilder<T> producerBuilder) : this(xClient.CreateClient(), producerBuilder.ProducerConfiguration)
+        {
+
+        }
+
         public ProducerBase(XClient xClient, ProducerConfiguration<T> producerConfiguration)
         {
-            this.xClient = xClient;
-            this.producerConfiguration = producerConfiguration;
+            _xClient = xClient;
+            _producerConfiguration = producerConfiguration;
 
-            logger = this.xClient.GetClientConfiguration()
+            _logger = _xClient.GetClientConfiguration()
                 .Logging
                 .GetLoggerFactory()
                 .CreateLogger(typeof(T));
 
             if (producerConfiguration.RetryProducing == true)
                 unsentMessagesBuffer = new ConcurrentQueue<RetryTransmitMessage>();
-        }
-        public ProducerBase(IXClientFactory xClient)
-        {
-            this.xClient = xClient.CreateClient();
-            producerConfiguration = new ProducerConfiguration<T>();
 
-            logger = this.xClient.GetClientConfiguration()
-                .Logging
-                .GetLoggerFactory()
-                .CreateLogger(typeof(T));
-
-        }
-        public ProducerBase(IXClientFactory xClient, ProducerConfiguration<T> producerConfiguration)
-        {
-            this.xClient = xClient.CreateClient();
-            this.producerConfiguration = producerConfiguration;
-
-            logger = this.xClient.GetClientConfiguration()
-                .Logging
-                .GetLoggerFactory()
-                .CreateLogger(typeof(T));
-
-            if (producerConfiguration.RetryProducing == true)
-                unsentMessagesBuffer = new ConcurrentQueue<RetryTransmitMessage>();
-        }
-
-        /// <summary>
-        /// Component Token, is needed only if the node asks for it
-        /// </summary>
-        /// <param name="componentToken">Component token</param>
-        /// <returns>ProducerBase</returns>
-        public ProducerBase<T> ComponentToken(string componentToken)
-        {
-            producerConfiguration.ComponentToken = componentToken;
-            return this;
-        }
-
-        /// <summary>
-        /// Component name where producer will produce.
-        /// </summary>
-        /// <param name="component">component name</param>
-        /// <returns>ProducerBase</returns>
-        public ProducerBase<T> Component(string component)
-        {
-            producerConfiguration.Component = component;
-            return this;
-        }
-
-        /// <summary>
-        /// Topic name where producer will produce messages
-        /// </summary>
-        /// <param name="topic">topic name</param>
-        /// <param name="isTopicPersistent">Is topic persistent flag tells the node to when it creates the topic to be persistent or not. default value is true </param>
-        /// <returns>ProducerBase</returns>
-        public ProducerBase<T> Topic(string topic, bool isTopicPersistent = true)
-        {
-            producerConfiguration.Topic = topic;
-            producerConfiguration.IsTopicPersistent = isTopicPersistent;
-
-            return this;
-        }
-
-        /// <summary>
-        /// Name is the producer name, is mandatory field.
-        /// </summary>
-        /// <param name="name">Producer name</param>
-        /// <returns>ProducerBase</returns>
-        public ProducerBase<T> Name(string name)
-        {
-            producerConfiguration.Name = name;
-            return this;
-        }
-
-        /// <summary>
-        /// Enable or Disable Retrying of messages producing if connection fails
-        /// Default value is False
-        /// </summary>
-        /// <param name="isRetryProducingActive">Enable retry producing</param>
-        /// <returns>ProducerBase</returns>
-        public ProducerBase<T> RetryProducing(bool isRetryProducingActive)
-        {
-            producerConfiguration.RetryProducing = isRetryProducingActive;
-            if (isRetryProducingActive == true)
-                unsentMessagesBuffer = new ConcurrentQueue<RetryTransmitMessage>();
-
-            return this;
-        }
-
-        /// <summary>
-        /// Tells the producer how many times to try producing the message
-        /// </summary>
-        /// <param name="nTimesRetry"> int number of tries</param>
-        /// <returns>ProducerBase</returns>
-        public ProducerBase<T> RetryProducingMessageNTimes(int nTimesRetry)
-        {
-            producerConfiguration.RetryProducingMessageNTimes = nTimesRetry;
-            return this;
-        }
-
-        /// <summary>
-        /// Build Producer
-        /// </summary>
-        /// <param name="openConnection">default value is true</param>
-        /// <returns>Task of ProducerBase</returns>
-        public async Task<ProducerBase<T>> BuildAsync(bool openConnection = true)
-        {
-            producerNodeService = new ProducerNodeService(new ProducerNodeProvider(xClient.GetClientConfiguration(), producerConfiguration), xClient.GetClientConfiguration());
-            producerNodeService.ProducerConnected += ProducerNodeService_ProducerConnected;
-            producerNodeService.ProducerDisconnected += ProducerNodeService_ProducerDisconnected;
-            producerNodeService.MessageStored += ProducerNodeService_MessageStored;
-            if (openConnection == true)
-                await producerNodeService.ConnectAsync();
-
-            isConnected = true;
-
-            isBuilt = true;
-
-            return this;
-        }
-
-        /// <summary>
-        /// Build Producer
-        /// </summary>
-        /// <param name="openConnection">default value is true</param>
-        /// <returns>ProducerBase</returns>
-        public ProducerBase<T> Build(bool openConnection = true)
-        {
-            return BuildAsync(openConnection).Result;
+            defaultHeaders = new Dictionary<string, object>();
         }
 
         /// <summary>
@@ -194,7 +86,7 @@ namespace Andy.X.Client.Abstractions
         }
 
         /// <summary>
-        /// Open connection
+        /// Open connection and start producer
         /// </summary>
         /// <returns>Task</returns>
         /// <exception cref="Exception">Producer should be built before closing</exception>
@@ -219,29 +111,81 @@ namespace Andy.X.Client.Abstractions
 
         private void ProducerNodeService_ProducerDisconnected(ProducerDisconnectedArgs obj)
         {
-            logger.LogWarning($"andyx-client  | Producer '{obj.ProducerName}|{obj.Id}' is disconnected");
+            _logger.LogWarning($"andyx-client  | Producer '{obj.ProducerName}|{obj.Id}' is disconnected");
         }
 
         private void ProducerNodeService_ProducerConnected(ProducerConnectedArgs obj)
         {
-            logger.LogWarning($"andyx-client  | Producer '{obj.ProducerName}|{obj.Id}' is connected");
+            _logger.LogWarning($"andyx-client  | Producer '{obj.ProducerName}|{obj.Id}' is connected");
         }
 
-        public Guid Produce(T tObject)
+        public Guid Produce(T tObject, Dictionary<string, object> headers = null)
         {
-            return ProduceAsync(tObject).Result;
+            return ProduceAsync(tObject, headers).Result;
         }
 
-        public async Task<Guid> ProduceAsync(T tObject)
+        public List<Guid> Produce(IList<T> messages, Dictionary<string, object> headers = null)
         {
-            var message = new TransmitMessageArgs()
+            return ProduceAsync(messages, headers).Result;
+        }
+
+        public async Task<List<Guid>> ProduceAsync(IList<T> messages, Dictionary<string, object> headers = null)
+        {
+            headers = AddDefaultHeaderIntoMessage(headers);
+            var ids = new List<Guid>();
+            var messagesArgs = new List<TransmitMessageArgs>();
+            foreach (var msg in messages)
+            {
+                Guid id = Guid.NewGuid();
+                messagesArgs.Add(new TransmitMessageArgs()
+                {
+                    Id = id,
+                    Tenant = _xClient.GetClientConfiguration().Tenant,
+                    Product = _xClient.GetClientConfiguration().Product,
+                    Component = _producerConfiguration.Component,
+                    Topic = _producerConfiguration.Topic,
+                    MessageRaw = msg,
+                    Headers = headers,
+                    SentDate = DateTime.UtcNow,
+                });
+                ids.Add(id);
+            }
+
+            if (producerNodeService.GetConnectionState() == HubConnectionState.Connected)
+            {
+                try
+                {
+                    await producerNodeService.TransmitMessages(messagesArgs);
+                    return ids;
+                }
+                catch (Exception)
+                {
+                    // moved the code to the end of method.
+                }
+            }
+
+            // Messages are not send
+            messagesArgs.ForEach(x =>
+            {
+                EnqueueMessageToBuffer(x);
+            });
+
+            return new List<Guid>();
+        }
+
+        public async Task<Guid> ProduceAsync(T message, Dictionary<string, object> headers = null)
+        {
+            headers = AddDefaultHeaderIntoMessage(headers);
+
+            var messageArgs = new TransmitMessageArgs()
             {
                 Id = Guid.NewGuid(),
-                Tenant = xClient.GetClientConfiguration().Tenant,
-                Product = xClient.GetClientConfiguration().Product,
-                Component = producerConfiguration.Component,
-                Topic = producerConfiguration.Topic,
-                MessageRaw = tObject,
+                Tenant = _xClient.GetClientConfiguration().Tenant,
+                Product = _xClient.GetClientConfiguration().Product,
+                Component = _producerConfiguration.Component,
+                Topic = _producerConfiguration.Topic,
+                MessageRaw = message,
+                Headers = headers,
                 SentDate = DateTime.UtcNow,
             };
 
@@ -249,25 +193,35 @@ namespace Andy.X.Client.Abstractions
             {
                 try
                 {
-                    await producerNodeService.TransmitMessage(message);
+                    await producerNodeService.TransmitMessage(messageArgs);
+                    return messageArgs.Id;
                 }
                 catch (Exception)
                 {
-                    EnqueueMessageToBuffer(message);
+                    // moved the code to the end of method.
                 }
             }
-            else
-            {
-                EnqueueMessageToBuffer(message);
-            }
 
-            return message.Id;
+            EnqueueMessageToBuffer(messageArgs);
+            return Guid.Empty;
+        }
+
+        private Dictionary<string, object> AddDefaultHeaderIntoMessage(Dictionary<string, object> headers)
+        {
+            if (headers == null)
+                headers = new Dictionary<string, object>();
+
+            foreach (var defaultHeader in defaultHeaders)
+            {
+                headers.Add(defaultHeader.Key, defaultHeader.Value);
+            }
+            return headers;
         }
 
         private void EnqueueMessageToBuffer(TransmitMessageArgs message)
         {
-            logger.LogWarning($"andyx-client  | Producing of message '{message.Id}' at {message.Tenant}/{message.Product}/{message.Component}/{message.Topic} failed, retrying 1 of {producerConfiguration.RetryProducingMessageNTimes} tires");
-            if (producerConfiguration.RetryProducing == true)
+            _logger.LogWarning($"andyx-client  | Producing of message '{message.Id}' at {message.Tenant}/{message.Product}/{message.Component}/{message.Topic} failed, retrying 1 of {_producerConfiguration.RetryProducingMessageNTimes} tires");
+            if (_producerConfiguration.RetryProducing == true)
             {
                 unsentMessagesBuffer.Enqueue(new RetryTransmitMessage()
                 {
@@ -298,7 +252,7 @@ namespace Andy.X.Client.Abstractions
                 bool isMessageReturned = unsentMessagesBuffer.TryDequeue(out retryTransmitMessage);
                 if (isMessageReturned == true)
                 {
-                    if (retryTransmitMessage.RetryCounter < producerConfiguration.RetryProducingMessageNTimes)
+                    if (retryTransmitMessage.RetryCounter < _producerConfiguration.RetryProducingMessageNTimes)
                     {
                         retryTransmitMessage.RetryCounter++;
 
@@ -319,7 +273,7 @@ namespace Andy.X.Client.Abstractions
                     else
                     {
                         // If RetryCounter is bigger than RetryProducerMessageNTimes ignore that message.
-                        logger.LogError($"andyx-client  | Producing of message '{retryTransmitMessage.TransmitMessageArgs.Id}' " +
+                        _logger.LogError($"andyx-client  | Producing of message '{retryTransmitMessage.TransmitMessageArgs.Id}' " +
                             $"at {retryTransmitMessage.TransmitMessageArgs.Tenant}/{retryTransmitMessage.TransmitMessageArgs.Product}" +
                             $"/{retryTransmitMessage.TransmitMessageArgs.Component}/{retryTransmitMessage.TransmitMessageArgs.Topic} failed, message is lost");
                     }
@@ -328,5 +282,141 @@ namespace Andy.X.Client.Abstractions
             isUnsentMessagesProcessorWorking = false;
         }
         #endregion
+
+        /// <summary>
+        /// Connect to component.
+        /// </summary>
+        /// <param name="component">Component Name</param>
+        /// <returns>Instance of ProducerBase for Topic Configuration.</returns>
+        public IProducerTopicConnection<T> ForComponent(string component)
+        {
+            ForComponent(component, "");
+
+            return this;
+        }
+
+        /// <summary>
+        /// Connect to component with component token.
+        /// </summary>
+        /// <param name="component">Component name.</param>
+        /// <param name="token">Component token</param>
+        /// <returns>Instance of ProducerBase for Topic Configuration.</returns>
+        public IProducerTopicConnection<T> ForComponent(string component, string token)
+        {
+            _producerConfiguration.Component = component;
+            _producerConfiguration.ComponentToken = token;
+
+            return this;
+        }
+
+        /// <summary>
+        /// Connect to persistent topic.
+        /// </summary>
+        /// <param name="topic">Topic name</param>
+        /// <returns>Instance of ProducerBase for Name configuration.</returns>
+        public IProducerNameConnection<T> AndTopic(string topic)
+        {
+            return AndTopic(topic, true);
+        }
+
+        /// <summary>
+        /// Connect to topic with as persistent or not.
+        /// </summary>
+        /// <param name="topic">Topic name.</param>
+        /// <param name="isPersistent">Topic type</param>
+        /// <returns>Instance of ProducerBase for Name configuration.</returns>
+        public IProducerNameConnection<T> AndTopic(string topic, bool isPersistent)
+        {
+            _producerConfiguration.Topic = topic;
+            _producerConfiguration.IsTopicPersistent = isPersistent;
+
+            return this;
+        }
+
+        /// <summary>
+        /// Give the name for the producer.
+        /// </summary>
+        /// <example>
+        /// Is recommended to call the producer with the application name.
+        /// </example>
+        /// <param name="name">Name of producer</param>
+        /// <returns>Instance of ProducerBase.</returns>
+        public IProducerOtherConfiguration<T> WithName(string name)
+        {
+            _producerConfiguration.Name = name;
+            return this;
+        }
+
+        /// <summary>
+        /// Add Headers to the message.
+        /// </summary>
+        /// <param name="key">key string value</param>
+        /// <param name="value">value object for the header</param>
+        /// <returns>Instance of ProducerBase.</returns>
+        public IProducerOtherConfiguration<T> AddDefaultHeader(string key, object value)
+        {
+            defaultHeaders.Add(key, value);
+            return this;
+        }
+
+        /// <summary>
+        /// Add Headers to the message.
+        /// </summary>
+        /// <param name="headers">Dictionary object for the headers</param>
+        /// <returns>Instance of ProducerBase.</returns>
+        public IProducerOtherConfiguration<T> AddDefaultHeader(IDictionary<string, object> headers)
+        {
+            foreach (var header in headers)
+            {
+                defaultHeaders.Add(header.Key, header.Value);
+            }
+            return this;
+        }
+
+        /// <summary>
+        /// Enable retrying of message producing, if production of messages fails.
+        /// </summary>
+        /// <returns>Instance of ProducerBase.</returns>
+        public IProducerOtherConfiguration<T> RetryProducingIfFails()
+        {
+            _producerConfiguration.RetryProducing = true;
+            unsentMessagesBuffer = new ConcurrentQueue<RetryTransmitMessage>();
+            return this;
+        }
+
+        /// <summary>
+        /// Configure the number of tries before droping the messages if connection fails.
+        /// </summary>
+        /// <param name="nTimesRetry">Max number of tries, type int</param>
+        /// <returns>Instance of ProducerBase</returns>
+        public IProducerOtherConfiguration<T> HowManyTimesToTryProducing(int nTimesRetry)
+        {
+            _producerConfiguration.RetryProducingMessageNTimes = nTimesRetry;
+
+            return this;
+        }
+
+        /// <summary>
+        /// Build Producer
+        /// </summary>
+        /// <returns>Producer object</returns>
+        public Producer<T> Build()
+        {
+            // Add default headers
+            defaultHeaders.Add("andyx-client", "Andy X Client for .NET");
+            defaultHeaders.Add("andyx-client-version", "v2.1");
+            defaultHeaders.Add("andyx-producer-name", _producerConfiguration.Name);
+            defaultHeaders.Add("andyx-content-type", "application/json");
+
+            producerNodeService = new ProducerNodeService(new ProducerNodeProvider(_xClient.GetClientConfiguration(), _producerConfiguration), _xClient.GetClientConfiguration());
+            producerNodeService.ProducerConnected += ProducerNodeService_ProducerConnected;
+            producerNodeService.ProducerDisconnected += ProducerNodeService_ProducerDisconnected;
+            producerNodeService.MessageStored += ProducerNodeService_MessageStored;
+
+            isConnected = false;
+            isBuilt = true;
+
+            return this as Producer<T>;
+        }
     }
 }

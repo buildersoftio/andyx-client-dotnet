@@ -3,17 +3,17 @@ using Andy.X.Client.Configurations;
 
 namespace Andy.X.Client.Factories
 {
-    public class XClientFactory: XClientConfiguration, IXClientFactory
+    public class XClientFactory : XClientConfiguration, IXClientFactory
     {
-        private readonly XClientConfiguration configuration;
+        private readonly XClientConfiguration _configuration;
         public XClientFactory(XClientConfiguration configuration)
         {
-            this.configuration = configuration;
+            _configuration = configuration;
         }
 
         public XClient CreateClient()
         {
-            return new XClient(configuration);
+            return XClient.CreateConnection(_configuration);
         }
     }
 }
