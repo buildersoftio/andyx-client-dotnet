@@ -1,5 +1,6 @@
 ﻿using Andy.X.Client;
 using Andy.X.Client.Configurations;
+using Andy.X.Client.Nodes;
 using andyx_examples.Models;
 using System;
 
@@ -10,25 +11,30 @@ namespace andyx_examples
         private readonly Consumer<SimpleMessage> consumer;
         public SimpleConsumer()
         {
-            XClient client = new XClient("https://localhost:6541");
+            XClient client = XClient.CreateConnection()
+                .ForService("localhost", 6541, NodeConnectionType.SSL)
+                .AndTenant("default")
+                .AndProduct("default")
+                .Build();
 
-            consumer = new Consumer<SimpleMessage>(client)
-                .Name("simple-consumer")
-                .Component("simple")
-                .Topic("simple-message")
-                .InitialPosition(InitialPosition.Earliest)
-                .SubscriptionType(SubscriptionType.Exclusive).Build() as Consumer<SimpleMessage>;
+            consumer = Consumer<SimpleMessage>.CreateNewConsumer(client)
+                .ForComponent("simple")
+                .AndTopic("simple-message")
+                .WithName("simple-consumer")
+                .WithInitialPosition(InitialPosition.Earliest)
+                .AndSubscriptionType(SubscriptionType.Exclusive)
+                .Build();
 
-            consumer.MessageReceived += Consumer_MessageReceived;
+                consumer.MessageReceived += Consumer_MessageReceived;
 
             consumer
-                .SubscribeAsync()
+                .ConnectAsync()
                 .Wait();
         }
 
         private bool Consumer_MessageReceived(object sender, Andy.X.Client.Events.Consumers.MessageReceivedArgs<SimpleMessage> e)
         {
-            Console.WriteLine($"Message arrived: payload as raw: '{e.RawData}'; payload as simpleMessage name='{e.Data.Name}'");
+            Console.WriteLine($"Message arrived: payload as raw: '{e.Payload}'; payload as simpleMessage name='{e.GenericPayload.Name}'");
 
             // Message acknowledged
             return true;

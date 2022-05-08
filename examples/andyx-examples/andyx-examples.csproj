@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Buildersoft.Andy.X.Client" Version="2.0.0-rc1" />
+    <PackageReference Include="Buildersoft.Andy.X.Client" Version="2.1.6" />
   </ItemGroup>
 
 </Project>

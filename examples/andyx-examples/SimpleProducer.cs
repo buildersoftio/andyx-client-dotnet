@@ -1,4 +1,5 @@
 ﻿using Andy.X.Client;
+using Andy.X.Client.Nodes;
 using andyx_examples.Models;
 
 namespace andyx_examples
@@ -8,14 +9,17 @@ namespace andyx_examples
         private readonly Producer<SimpleMessage> producer;
         public SimpleProducer()
         {
-            XClient client = new XClient("https://localhost:6541");
+            XClient client = XClient.CreateConnection()
+                .ForService("localhost", 6541, NodeConnectionType.SSL)
+                .AndTenant("default")
+                .AndProduct("default")
+                .Build();
 
-            producer = new Producer<SimpleMessage>(client)
-                .Name("simple-producer")
-                .Component("simple")
-                .Topic("simple-message")
-                .RetryProducing(true)
-                .BuildAsync().Result as Producer<SimpleMessage>;
+            producer = Producer<SimpleMessage>.CreateNewProducer(client)
+                .ForComponent("simple")
+                .AndTopic("simple-message")
+                .WithName("simple-producer")
+                .Build();
 
             producer.OpenAsync().Wait();
         }
