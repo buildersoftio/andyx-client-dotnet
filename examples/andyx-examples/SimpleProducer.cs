@@ -10,7 +10,7 @@ namespace andyx_examples
         public SimpleProducer()
         {
             XClient client = XClient.CreateConnection()
-                .ForService("localhost", 6541, NodeConnectionType.SSL)
+                .ForService("192.168.0.24", 6540, NodeConnectionType.NON_SSL)
                 .AndTenant("default")
                 .AndProduct("default")
                 .Build();

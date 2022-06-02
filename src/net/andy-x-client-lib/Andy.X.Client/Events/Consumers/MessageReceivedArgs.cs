@@ -10,26 +10,42 @@ namespace Andy.X.Client.Events.Consumers
         public string Component { get; private set; }
         public string Topic { get; private set; }
 
-        public Guid MessageId { get; private set; }
+        public long LedgerId { get; set; }
+        public long EntryId { get; set; }
 
-        public Dictionary<string, object> Headers{ get; set; }
+        public string MessageId { get; private set; }
+
+        public Dictionary<string, string> Headers{ get; set; }
 
         // Summary:
-        //     Gets the message data as a System.Object.
-        public object Payload { get; private set; }
+        //     Gets the message data as a byte[].
+        public byte[] Payload { get; private set; }
         public T GenericPayload { get; private set; }
 
-        public DateTime SentDate { get; private set; }
-        public DateTime ReceivedDate { get; private set; }
+        public DateTimeOffset SentDate { get; private set; }
+        public DateTimeOffset ReceivedDate { get; private set; }
 
 
 
-        public MessageReceivedArgs(string tenant, string product, string component, string topic, Guid messageId, Dictionary<string, object> headers, object payload, T genericPayload, DateTime sentDate)
+        public MessageReceivedArgs(string tenant, 
+            string product, 
+            string component, 
+            string topic, 
+            long ledgerId,
+            long entryId,
+            string messageId, 
+            Dictionary<string, string> headers, 
+            byte[] payload, 
+            T genericPayload,
+            DateTimeOffset sentDate)
         {
             Tenant = tenant;
             Product = product;
             Component = component;
             Topic = topic;
+
+            LedgerId = ledgerId;
+            EntryId = entryId;
 
             MessageId = messageId;
             Headers = headers;
@@ -37,7 +53,7 @@ namespace Andy.X.Client.Events.Consumers
             GenericPayload = genericPayload;
 
             SentDate = sentDate;
-            ReceivedDate = DateTime.UtcNow;
+            ReceivedDate = DateTimeOffset.UtcNow;
         }
     }
 }

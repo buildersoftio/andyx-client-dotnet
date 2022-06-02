@@ -1,5 +1,9 @@
 ﻿using Andy.X.Client.Configurations;
+using MessagePack;
+using MessagePack.Resolvers;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Andy.X.Client.Abstractions
 {
@@ -18,7 +22,7 @@ namespace Andy.X.Client.Abstractions
                 this.producerConfig = producerConfig;
 
                 _connection = new HubConnectionBuilder()
-                    .WithUrl($"{xClientConfig.ServiceUrl}/realtime/v2/producer", option =>
+                    .WithUrl($"{xClientConfig.ServiceUrl}/realtime/v3/producer", option =>
                     {
                         option.HttpMessageHandlerFactory = (message) =>
                         {
@@ -32,11 +36,17 @@ namespace Andy.X.Client.Abstractions
                         option.Headers["x-andyx-product"] = xClientConfig.Product;
                         option.Headers["x-andyx-component"] = producerConfig.Component;
                         option.Headers["x-andyx-topic"] = producerConfig.Topic;
-                        option.Headers["x-andyx-producer"] = producerConfig.Name;
+                        option.Headers["x-andyx-producer-name"] = producerConfig.Name;
 
                         option.Headers["x-andyx-topic-is-persistent"] = producerConfig.IsTopicPersistent.ToString();
                     })
                     .WithAutomaticReconnect()
+                    .AddMessagePackProtocol()
+                    .ConfigureLogging(factory =>
+                    {
+                        factory.AddConsole();
+                        factory.AddFilter("Console", level => level >= LogLevel.Trace);
+                    })
                     .Build();
             }
 

@@ -3,6 +3,7 @@ using Andy.X.Client.Builders;
 using Andy.X.Client.Configurations;
 using Andy.X.Client.Events.Consumers;
 using Andy.X.Client.Extensions;
+using MessagePack;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
@@ -17,7 +18,7 @@ namespace Andy.X.Client.Abstractions
         IConsumerSubscriptionTypeConnection<T>,
         IConsumerOtherConfiguration<T>
     {
-        public delegate bool OnMessageReceivedHandler(object sender, MessageReceivedArgs<T> e);
+        public delegate MessageAcknowledgement OnMessageReceivedHandler(object sender, MessageReceivedArgs<T> e);
         public event OnMessageReceivedHandler MessageReceived;
 
         private readonly XClient xClient;
@@ -56,6 +57,17 @@ namespace Andy.X.Client.Abstractions
         }
 
         /// <summary>
+        /// Subscription name
+        /// </summary>
+        /// <param name="subscriptionType">Subscription type</param>
+        /// <returns>ConsumerBase</returns>
+        public ConsumerBase<T> SubscriptionName(string subscriptionName)
+        {
+            consumerConfiguration.SubscriptionSettings.SubscriptionName = subscriptionName;
+            return this;
+        }
+
+        /// <summary>
         /// Subscription Type represents how the Consumer consumes messages
         /// Default value SubscriptionType=Exclusive
         /// </summary>
@@ -63,7 +75,13 @@ namespace Andy.X.Client.Abstractions
         /// <returns>ConsumerBase</returns>
         public ConsumerBase<T> SubscriptionType(SubscriptionType subscriptionType)
         {
-            consumerConfiguration.SubscriptionType = subscriptionType;
+            consumerConfiguration.SubscriptionSettings.SubscriptionType = subscriptionType;
+            return this;
+        }
+
+        public ConsumerBase<T> SubscriptionMode(SubscriptionMode subscriptionMode)
+        {
+            consumerConfiguration.SubscriptionSettings.SubscriptionMode = subscriptionMode;
             return this;
         }
 
@@ -83,32 +101,31 @@ namespace Andy.X.Client.Abstractions
             return this as Consumer<T>;
         }
 
-        public async Task AcknowledgeMessage(Guid messageId, bool isAcked = true)
+        public async Task AcknowledgeMessage(long ledgerId, long entryId, MessageAcknowledgement messageAcknowledgement)
         {
             await consumerNodeService.AcknowledgeMessage(new AcknowledgeMessageArgs()
             {
-                Tenant = xClient.GetClientConfiguration().Tenant,
-                Product = xClient.GetClientConfiguration().Product,
-                Component = consumerConfiguration.Component,
-                Topic = consumerConfiguration.Topic,
-                Consumer = consumerConfiguration.Name,
-                IsAcknowledged = isAcked,
-                MessageId = messageId
+                LedgerId = ledgerId,
+                EntryId = entryId,
+
+                Acknowledgement = (int)messageAcknowledgement
             });
         }
 
         private async void ConsumerNodeService_MessageInternalReceived(MessageInternalReceivedArgs obj)
         {
-            T parsedPayload = obj.MessageRaw.ToJson().TryJsonToObject<T>();
+            T parsedPayload = MessagePackSerializer.Deserialize<T>(obj.Payload, MessagePack.Resolvers.ContractlessStandardResolver.Options);
             try
             {
-                bool? isMessageAcknowledged = MessageReceived?.Invoke(this, new MessageReceivedArgs<T>(obj.Tenant,
+                MessageAcknowledgement? isMessageAcknowledged = MessageReceived?.Invoke(this, new MessageReceivedArgs<T>(obj.Tenant,
                     obj.Product,
                     obj.Component,
                     obj.Topic,
-                    obj.Id,
+                    obj.LedgerId,
+                    obj.EntryId,
+                    obj.MessageId,
                     obj.Headers,
-                    obj.MessageRaw,
+                    obj.Payload,
                     parsedPayload,
                     obj.SentDate));
 
@@ -119,13 +136,9 @@ namespace Andy.X.Client.Abstractions
                 {
                     await consumerNodeService.AcknowledgeMessage(new AcknowledgeMessageArgs()
                     {
-                        Tenant = obj.Tenant,
-                        Product = obj.Product,
-                        Component = obj.Component,
-                        Topic = obj.Topic,
-                        Consumer = consumerConfiguration.Name,
-                        IsAcknowledged = isMessageAcknowledged.Value,
-                        MessageId = obj.Id
+                        LedgerId = obj.LedgerId,
+                        EntryId = obj.EntryId,
+                        Acknowledgement = (int)isMessageAcknowledged.Value
                     });
                 }
             }
@@ -137,14 +150,11 @@ namespace Andy.X.Client.Abstractions
 
                 await consumerNodeService.AcknowledgeMessage(new AcknowledgeMessageArgs()
                 {
-                    Tenant = obj.Tenant,
-                    Product = obj.Product,
-                    Component = obj.Component,
-                    Topic = obj.Topic,
-                    Consumer = consumerConfiguration.Name,
-                    IsAcknowledged = false,
-                    MessageId = obj.Id
+                    LedgerId = obj.LedgerId,
+                    EntryId = obj.EntryId,
+                    Acknowledgement = (int)MessageAcknowledgement.Unacknowledged
                 });
+
                 logger.LogError($"MessageReceived failed to process, message is not acknowledged. Error description: '{ex.Message}'");
             }
         }
@@ -231,7 +241,7 @@ namespace Andy.X.Client.Abstractions
         /// <returns>Instance of ConsumerBase for SubscriptionType.</returns>
         public IConsumerSubscriptionTypeConnection<T> WithInitialPosition(InitialPosition initialPosition)
         {
-            consumerConfiguration.InitialPosition = initialPosition;
+            consumerConfiguration.SubscriptionSettings.InitialPosition = initialPosition;
 
             return this;
         }
@@ -243,7 +253,7 @@ namespace Andy.X.Client.Abstractions
         /// <returns>Instance of ConsumerBase.</returns>
         public IConsumerOtherConfiguration<T> AndSubscriptionType(SubscriptionType subscriptionType)
         {
-            consumerConfiguration.SubscriptionType = subscriptionType;
+            consumerConfiguration.SubscriptionSettings.SubscriptionType = subscriptionType;
 
             return this;
         }

@@ -9,6 +9,9 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using Andy.X.Client.Builders;
 using Andy.X.Client.Abstractions.Producers;
+using Andy.X.Client.Extensions;
+using System.Text;
+using MessagePack;
 
 namespace Andy.X.Client.Abstractions
 {
@@ -32,7 +35,7 @@ namespace Andy.X.Client.Abstractions
         private ConcurrentQueue<RetryTransmitMessage> unsentMessagesBuffer;
         private bool isUnsentMessagesProcessorWorking = false;
 
-        private Dictionary<string, object> defaultHeaders;
+        private Dictionary<string, string> defaultHeaders;
 
         public ProducerBase(XClient xClient) : this(xClient, new ProducerConfiguration<T>())
         {
@@ -66,7 +69,7 @@ namespace Andy.X.Client.Abstractions
             if (producerConfiguration.RetryProducing == true)
                 unsentMessagesBuffer = new ConcurrentQueue<RetryTransmitMessage>();
 
-            defaultHeaders = new Dictionary<string, object>();
+            defaultHeaders = new Dictionary<string, string>();
         }
 
         /// <summary>
@@ -119,17 +122,17 @@ namespace Andy.X.Client.Abstractions
             _logger.LogWarning($"andyx-client  | Producer '{obj.ProducerName}|{obj.Id}' is connected");
         }
 
-        public Guid Produce(T tObject, Dictionary<string, object> headers = null)
+        public Guid Produce(T tObject, Dictionary<string, string> headers = null)
         {
             return ProduceAsync(tObject, headers).Result;
         }
 
-        public List<Guid> Produce(IList<T> messages, Dictionary<string, object> headers = null)
+        public List<Guid> Produce(IList<T> messages, Dictionary<string, string> headers = null)
         {
             return ProduceAsync(messages, headers).Result;
         }
 
-        public async Task<List<Guid>> ProduceAsync(IList<T> messages, Dictionary<string, object> headers = null)
+        public async Task<List<Guid>> ProduceAsync(IList<T> messages, Dictionary<string, string> headers = null)
         {
             headers = AddDefaultHeaderIntoMessage(headers);
             var ids = new List<Guid>();
@@ -137,16 +140,19 @@ namespace Andy.X.Client.Abstractions
             foreach (var msg in messages)
             {
                 Guid id = Guid.NewGuid();
+                // MessagePackSerializer.Serialize(msg);
                 messagesArgs.Add(new TransmitMessageArgs()
                 {
-                    Id = id,
+                    Id = id.ToString(),
                     Tenant = _xClient.GetClientConfiguration().Tenant,
                     Product = _xClient.GetClientConfiguration().Product,
                     Component = _producerConfiguration.Component,
                     Topic = _producerConfiguration.Topic,
-                    MessageRaw = msg,
+                    // this one works too, but for now we will use ContractlessStandardResolver. When we will create the schema registry we will enable resolvers.
+                    //Payload = MessagePackSerializer.Typeless.Serialize(msg),
+                    Payload = MessagePackSerializer.Serialize(msg, MessagePack.Resolvers.ContractlessStandardResolver.Options),
                     Headers = headers,
-                    SentDate = DateTime.UtcNow,
+                    SentDate = DateTimeOffset.UtcNow,
                 });
                 ids.Add(id);
             }
@@ -173,20 +179,22 @@ namespace Andy.X.Client.Abstractions
             return new List<Guid>();
         }
 
-        public async Task<Guid> ProduceAsync(T message, Dictionary<string, object> headers = null)
+        public async Task<Guid> ProduceAsync(T message, Dictionary<string, string> headers = null)
         {
             headers = AddDefaultHeaderIntoMessage(headers);
 
             var messageArgs = new TransmitMessageArgs()
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.NewGuid().ToString(),
                 Tenant = _xClient.GetClientConfiguration().Tenant,
                 Product = _xClient.GetClientConfiguration().Product,
                 Component = _producerConfiguration.Component,
                 Topic = _producerConfiguration.Topic,
-                MessageRaw = message,
+                // this one works too, but for now we will use ContractlessStandardResolver. When we will create the schema registry we will enable resolvers.
+                //Payload = MessagePackSerializer.Typeless.Serialize(message),
+                Payload = MessagePackSerializer.Serialize(message, MessagePack.Resolvers.ContractlessStandardResolver.Options),
                 Headers = headers,
-                SentDate = DateTime.UtcNow,
+                SentDate = DateTimeOffset.UtcNow,
             };
 
             if (producerNodeService.GetConnectionState() == HubConnectionState.Connected)
@@ -194,7 +202,7 @@ namespace Andy.X.Client.Abstractions
                 try
                 {
                     await producerNodeService.TransmitMessage(messageArgs);
-                    return messageArgs.Id;
+                    return Guid.Parse(messageArgs.Id);
                 }
                 catch (Exception)
                 {
@@ -206,10 +214,10 @@ namespace Andy.X.Client.Abstractions
             return Guid.Empty;
         }
 
-        private Dictionary<string, object> AddDefaultHeaderIntoMessage(Dictionary<string, object> headers)
+        private Dictionary<string, string> AddDefaultHeaderIntoMessage(Dictionary<string, string> headers)
         {
             if (headers == null)
-                headers = new Dictionary<string, object>();
+                headers = new Dictionary<string, string>();
 
             foreach (var defaultHeader in defaultHeaders)
             {
@@ -353,7 +361,7 @@ namespace Andy.X.Client.Abstractions
         /// <param name="key">key string value</param>
         /// <param name="value">value object for the header</param>
         /// <returns>Instance of ProducerBase.</returns>
-        public IProducerOtherConfiguration<T> AddDefaultHeader(string key, object value)
+        public IProducerOtherConfiguration<T> AddDefaultHeader(string key, string value)
         {
             defaultHeaders.Add(key, value);
             return this;
@@ -364,7 +372,7 @@ namespace Andy.X.Client.Abstractions
         /// </summary>
         /// <param name="headers">Dictionary object for the headers</param>
         /// <returns>Instance of ProducerBase.</returns>
-        public IProducerOtherConfiguration<T> AddDefaultHeader(IDictionary<string, object> headers)
+        public IProducerOtherConfiguration<T> AddDefaultHeader(IDictionary<string, string> headers)
         {
             foreach (var header in headers)
             {
@@ -404,7 +412,7 @@ namespace Andy.X.Client.Abstractions
         {
             // Add default headers
             defaultHeaders.Add("andyx-client", "Andy X Client for .NET");
-            defaultHeaders.Add("andyx-client-version", "v2.1");
+            defaultHeaders.Add("andyx-client-version", "v3.0.0-alpha1");
             defaultHeaders.Add("andyx-producer-name", _producerConfiguration.Name);
             defaultHeaders.Add("andyx-content-type", "application/json");
 

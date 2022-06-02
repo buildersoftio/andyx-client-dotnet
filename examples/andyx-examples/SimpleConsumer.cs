@@ -12,7 +12,7 @@ namespace andyx_examples
         public SimpleConsumer()
         {
             XClient client = XClient.CreateConnection()
-                .ForService("localhost", 6541, NodeConnectionType.SSL)
+                .ForService("192.168.0.24", 6540, NodeConnectionType.NON_SSL)
                 .AndTenant("default")
                 .AndProduct("default")
                 .Build();
@@ -31,10 +31,11 @@ namespace andyx_examples
                 .ConnectAsync()
                 .Wait();
         }
-
+        int k = 0;
         private bool Consumer_MessageReceived(object sender, Andy.X.Client.Events.Consumers.MessageReceivedArgs<SimpleMessage> e)
         {
-            Console.WriteLine($"Message arrived: payload as raw: '{e.Payload}'; payload as simpleMessage name='{e.GenericPayload.Name}'");
+            k++;
+            Console.WriteLine($"index:{k} => Message arrived: payload as raw: '{e.Payload}'; payload as simpleMessage name='{e.GenericPayload.Name}'");
 
             // Message acknowledged
             return true;

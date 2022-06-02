@@ -29,6 +29,20 @@
         /// </summary>
         public bool IsTopicPersistent { get; set; }
 
+        public SubscriptionSettings SubscriptionSettings { get; set; }
+
+
+        public ConsumerConfiguration()
+        {
+            SubscriptionSettings = new SubscriptionSettings();
+            IsTopicPersistent = true;
+            Name = "default";
+        }
+    }
+
+    public class SubscriptionSettings
+    {
+        public string SubscriptionName { get; set; }
         /// <summary>
         /// Subscription Type represents how the Consumer consumes messages
         /// Default value SubscriptionType=Exclusive
@@ -42,32 +56,43 @@
         /// Default value is Latest
         /// </summary>
         public InitialPosition InitialPosition { get; set; }
+        public SubscriptionMode SubscriptionMode { get; set; }
 
 
-        public ConsumerConfiguration()
+        public SubscriptionSettings()
         {
-            IsTopicPersistent = true;
-
-            SubscriptionType = SubscriptionType.Exclusive;
+            SubscriptionType = SubscriptionType.Unique;
+            SubscriptionMode = SubscriptionMode.Resilient;
             InitialPosition = InitialPosition.Latest;
-
-            Name = "default";
         }
     }
 
     public enum SubscriptionType
     {
         /// <summary>
-        /// Only one consumer with the same name
+        /// Only one consumer
         /// </summary>
-        Exclusive,
+        Unique,
         /// <summary>
-        /// One consumer with one backup with the same name
+        /// One consumer with one backup
         /// </summary>
         Failover,
         /// <summary>
-        /// Shared to more than one consumer with the same name
+        /// Shared to more than one consumer.
         /// </summary>
         Shared
+    }
+
+    public enum SubscriptionMode
+    {
+        /// <summary>
+        /// Durable
+        /// </summary>
+        Resilient,
+
+        /// <summary>
+        /// Non Durable
+        /// </summary>
+        NonResilient
     }
 }

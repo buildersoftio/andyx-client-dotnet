@@ -1,5 +1,8 @@
 ﻿using Andy.X.Client.Configurations;
+using MessagePack;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Andy.X.Client.Abstractions
 {
@@ -18,7 +21,7 @@ namespace Andy.X.Client.Abstractions
                 this.consumerConfig = consumerConfig;
 
                 _connection = new HubConnectionBuilder()
-                     .WithUrl($"{xClientConfig.ServiceUrl}/realtime/v2/consumer", option =>
+                     .WithUrl($"{xClientConfig.ServiceUrl}/realtime/v3/consumer", option =>
                      {
                          option.HttpMessageHandlerFactory = (message) =>
                          {
@@ -32,13 +35,21 @@ namespace Andy.X.Client.Abstractions
                          option.Headers["x-andyx-product"] = xClientConfig.Product;
                          option.Headers["x-andyx-component"] = consumerConfig.Component;
                          option.Headers["x-andyx-topic"] = consumerConfig.Topic;
-                         option.Headers["x-andyx-consumer"] = consumerConfig.Name;
-                         option.Headers["x-andyx-consumer-type"] = consumerConfig.SubscriptionType.ToString();
-
+                         option.Headers["x-andyx-consumer-name"] = consumerConfig.Name;
                          option.Headers["x-andyx-topic-is-persistent"] = consumerConfig.IsTopicPersistent.ToString();
-                         option.Headers["x-andyx-consumer-initial-position"] = consumerConfig.InitialPosition.ToString();
+
+                         option.Headers["x-andyx-subscription-name"] = consumerConfig.SubscriptionSettings.SubscriptionName;
+                         option.Headers["x-andyx-subscription-type"] = consumerConfig.SubscriptionSettings.SubscriptionType.ToString();
+                         option.Headers["x-andyx-subscription-mode"] = consumerConfig.SubscriptionSettings.SubscriptionMode.ToString();
+                         option.Headers["x-andyx-subscription-initial-position"] = consumerConfig.SubscriptionSettings.InitialPosition.ToString();
                      })
                      .WithAutomaticReconnect()
+                     .AddMessagePackProtocol()
+                     .ConfigureLogging(factory =>
+                     {
+                         factory.AddConsole();
+                         factory.AddFilter("Console", level => level >= LogLevel.Trace);
+                     })
                      .Build();
             }
             public HubConnection GetHubConnection()
