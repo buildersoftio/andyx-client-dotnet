@@ -8,9 +8,10 @@ namespace Andy.X.Client.Abstractions
         public class AcknowledgeMessageArgs
         {
             [Key(0)]
-            public long LedgerId { get; set; }
-            [Key(1)]
             public long EntryId { get; set; }
+
+            [Key(1)]
+            public string NodeId { get; set; }
 
             [Key(2)]
             public int Acknowledgement { get; set; }

@@ -19,9 +19,10 @@ namespace Andy.X.Client.Abstractions
             public string Topic { get; set; }
 
             [Key(4)]
-            public long LedgerId { get; set; }
-            [Key(5)]
             public long EntryId { get; set; }
+
+            [Key(5)]
+            public string NodeId { get; set; }
 
             [Key(6)]
             public Dictionary<string, string> Headers { get; set; }

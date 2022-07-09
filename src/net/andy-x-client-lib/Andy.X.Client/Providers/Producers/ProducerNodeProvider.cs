@@ -4,6 +4,7 @@ using MessagePack.Resolvers;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System.Net.Http;
 
 namespace Andy.X.Client.Abstractions
 {
@@ -24,9 +25,19 @@ namespace Andy.X.Client.Abstractions
                 _connection = new HubConnectionBuilder()
                     .WithUrl($"{xClientConfig.ServiceUrl}/realtime/v3/producer", option =>
                     {
+                        //option.HttpMessageHandlerFactory = (message) =>
+                        //{
+                        //    return xClientConfig.HttpClientHandler;
+                        //};
+
+
                         option.HttpMessageHandlerFactory = (message) =>
                         {
-                            return xClientConfig.HttpClientHandler;
+                            if (message is HttpClientHandler clientHandler)
+                                // always verify the SSL certificate
+                                clientHandler.ServerCertificateCustomValidationCallback +=
+                                    (sender, certificate, chain, sslPolicyErrors) => { return true; };
+                            return message;
                         };
 
                         option.Headers["x-andyx-tenant-authoriziation"] = xClientConfig.TenantToken;

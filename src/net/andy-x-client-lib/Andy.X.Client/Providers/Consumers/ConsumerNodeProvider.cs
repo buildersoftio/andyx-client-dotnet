@@ -3,6 +3,7 @@ using MessagePack;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System.Net.Http;
 
 namespace Andy.X.Client.Abstractions
 {
@@ -47,7 +48,7 @@ namespace Andy.X.Client.Abstractions
                      .AddMessagePackProtocol()
                      .ConfigureLogging(factory =>
                      {
-                         factory.AddConsole();
+                         factory.AddSystemdConsole();
                          factory.AddFilter("Console", level => level >= LogLevel.Trace);
                      })
                      .Build();

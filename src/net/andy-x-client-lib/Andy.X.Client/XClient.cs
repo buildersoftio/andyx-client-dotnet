@@ -95,6 +95,8 @@ namespace Andy.X.Client
             {
                 _xClientConfiguration.HttpClientHandler.ServerCertificateCustomValidationCallback +=
                    (sender, certificate, chain, sslPolicyErrors) => { return true; };
+
+
             }
 
             return this;

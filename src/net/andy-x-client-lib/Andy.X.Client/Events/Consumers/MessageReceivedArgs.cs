@@ -10,12 +10,12 @@ namespace Andy.X.Client.Events.Consumers
         public string Component { get; private set; }
         public string Topic { get; private set; }
 
-        public long LedgerId { get; set; }
         public long EntryId { get; set; }
+        public string NodeId { get; set; }
 
         public string MessageId { get; private set; }
 
-        public Dictionary<string, string> Headers{ get; set; }
+        public Dictionary<string, string> Headers { get; set; }
 
         // Summary:
         //     Gets the message data as a byte[].
@@ -27,15 +27,15 @@ namespace Andy.X.Client.Events.Consumers
 
 
 
-        public MessageReceivedArgs(string tenant, 
-            string product, 
-            string component, 
-            string topic, 
-            long ledgerId,
+        public MessageReceivedArgs(string tenant,
+            string product,
+            string component,
+            string topic,
             long entryId,
-            string messageId, 
-            Dictionary<string, string> headers, 
-            byte[] payload, 
+            string nodeId,
+            string messageId,
+            Dictionary<string, string> headers,
+            byte[] payload,
             T genericPayload,
             DateTimeOffset sentDate)
         {
@@ -44,8 +44,8 @@ namespace Andy.X.Client.Events.Consumers
             Component = component;
             Topic = topic;
 
-            LedgerId = ledgerId;
             EntryId = entryId;
+            NodeId = nodeId;
 
             MessageId = messageId;
             Headers = headers;

@@ -101,13 +101,12 @@ namespace Andy.X.Client.Abstractions
             return this as Consumer<T>;
         }
 
-        public async Task AcknowledgeMessage(long ledgerId, long entryId, MessageAcknowledgement messageAcknowledgement)
+        public async Task AcknowledgeMessage(string nodeId, long entryId, MessageAcknowledgement messageAcknowledgement)
         {
             await consumerNodeService.AcknowledgeMessage(new AcknowledgeMessageArgs()
             {
-                LedgerId = ledgerId,
                 EntryId = entryId,
-
+                NodeId = nodeId,
                 Acknowledgement = (int)messageAcknowledgement
             });
         }
@@ -121,8 +120,8 @@ namespace Andy.X.Client.Abstractions
                     obj.Product,
                     obj.Component,
                     obj.Topic,
-                    obj.LedgerId,
                     obj.EntryId,
+                    obj.NodeId,
                     obj.MessageId,
                     obj.Headers,
                     obj.Payload,
@@ -136,8 +135,8 @@ namespace Andy.X.Client.Abstractions
                 {
                     await consumerNodeService.AcknowledgeMessage(new AcknowledgeMessageArgs()
                     {
-                        LedgerId = obj.LedgerId,
                         EntryId = obj.EntryId,
+                        NodeId = obj.NodeId,
                         Acknowledgement = (int)isMessageAcknowledged.Value
                     });
                 }
@@ -150,8 +149,8 @@ namespace Andy.X.Client.Abstractions
 
                 await consumerNodeService.AcknowledgeMessage(new AcknowledgeMessageArgs()
                 {
-                    LedgerId = obj.LedgerId,
                     EntryId = obj.EntryId,
+                    NodeId = obj.NodeId,
                     Acknowledgement = (int)MessageAcknowledgement.Unacknowledged
                 });
 
