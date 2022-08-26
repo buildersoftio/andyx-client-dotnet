@@ -1,7 +1,6 @@
 ﻿using MessagePack;
 using System;
 
-
 namespace Andy.X.Client.Abstractions
 {
     public abstract partial class ConsumerBase<T>
@@ -19,8 +18,11 @@ namespace Andy.X.Client.Abstractions
             public string Topic { get; set; }
 
             [Key(4)]
-            public Guid Id { get; set; }
+            public string Subscription { get; set; }
+
             [Key(5)]
+            public Guid Id { get; set; }
+            [Key(6)]
             public string ConsumerName { get; set; }
         }
     }
