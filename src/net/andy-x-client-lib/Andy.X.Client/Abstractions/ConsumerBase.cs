@@ -95,10 +95,16 @@ namespace Andy.X.Client.Abstractions
             consumerNodeService.ConsumerConnected += ConsumerNodeService_ConsumerConnected;
             consumerNodeService.ConsumerDisconnected += ConsumerNodeService_ConsumerDisconnected;
             consumerNodeService.MessageInternalReceived += ConsumerNodeService_MessageInternalReceived;
+            consumerNodeService.AndyOrderedDisconnect += ConsumerNodeService_AndyOrderedDisconnect;
 
             isBuilt = true;
 
             return this as Consumer<T>;
+        }
+
+        private async void ConsumerNodeService_AndyOrderedDisconnect(string obj)
+        {
+            await consumerNodeService.DisconnectAsync();
         }
 
         public async Task AcknowledgeMessage(string nodeId, long entryId, MessageAcknowledgement messageAcknowledgement)

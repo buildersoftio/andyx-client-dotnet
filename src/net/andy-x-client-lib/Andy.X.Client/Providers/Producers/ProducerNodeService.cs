@@ -21,6 +21,7 @@ namespace Andy.X.Client.Abstractions
             public event Action<ProducerConnectedArgs> ProducerConnected;
             public event Action<ProducerDisconnectedArgs> ProducerDisconnected;
             public event Action<MessageStoredArgs> MessageStored;
+            public event Action<string> AndyOrderedDisconnect;
 
             public ProducerNodeService(ProducerNodeProvider producerNodeProvider,
                 XClientConfiguration xClientConfiguration)
@@ -42,6 +43,7 @@ namespace Andy.X.Client.Abstractions
                 _connection.On<ProducerConnectedArgs>("ProducerConnected", connectedArgs => ProducerConnected?.Invoke(connectedArgs));
                 _connection.On<ProducerDisconnectedArgs>("ProducerDisconnected", disconnected => ProducerDisconnected?.Invoke(disconnected));
                 _connection.On<MessageStoredArgs>("MessageStored", received => MessageStored?.Invoke(received));
+                _connection.On<string>("AndyOrderedDisconnect", message => AndyOrderedDisconnect?.Invoke(message));
             }
 
             private Task Connection_Reconnecting(Exception arg)

@@ -420,11 +420,17 @@ namespace Andy.X.Client.Abstractions
             producerNodeService.ProducerConnected += ProducerNodeService_ProducerConnected;
             producerNodeService.ProducerDisconnected += ProducerNodeService_ProducerDisconnected;
             producerNodeService.MessageStored += ProducerNodeService_MessageStored;
+            producerNodeService.AndyOrderedDisconnect += ProducerNodeService_AndyOrderedDisconnect;
 
             isConnected = false;
             isBuilt = true;
 
             return this as Producer<T>;
+        }
+
+        private async void ProducerNodeService_AndyOrderedDisconnect(string obj)
+        {
+           await producerNodeService.DisconnectAsync();
         }
     }
 }

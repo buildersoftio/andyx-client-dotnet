@@ -23,20 +23,20 @@ namespace Andy.X.Client.Abstractions
                 _connection = new HubConnectionBuilder()
                     .WithUrl($"{xClientConfig.ServiceUrl}/realtime/v3/producer", option =>
                     {
-                        //option.HttpMessageHandlerFactory = (message) =>
-                        //{
-                        //    return xClientConfig.HttpClientHandler;
-                        //};
-
-
                         option.HttpMessageHandlerFactory = (message) =>
                         {
-                            if (message is HttpClientHandler clientHandler)
-                                // always verify the SSL certificate
-                                clientHandler.ServerCertificateCustomValidationCallback +=
-                                    (sender, certificate, chain, sslPolicyErrors) => { return true; };
-                            return message;
+                            return xClientConfig.HttpClientHandler;
                         };
+
+
+                        //option.HttpMessageHandlerFactory = (message) =>
+                        //{
+                        //    if (message is HttpClientHandler clientHandler)
+                        //        // always verify the SSL certificate
+                        //        clientHandler.ServerCertificateCustomValidationCallback +=
+                        //            (sender, certificate, chain, sslPolicyErrors) => { return true; };
+                        //    return message;
+                        //};
 
                         option.Headers["x-andyx-tenant-authoriziation"] = xClientConfig.TenantToken;
                         option.Headers["x-andyx-component-authoriziation"] = producerConfig.ComponentToken;
@@ -53,8 +53,8 @@ namespace Andy.X.Client.Abstractions
                     .AddMessagePackProtocol()
                     .ConfigureLogging(factory =>
                     {
-                        factory.AddConsole();
-                        factory.AddFilter("Console", level => level >= LogLevel.Trace);
+                        factory.AddSystemdConsole();
+                        factory.AddFilter("Console", level => level >= LogLevel.Information);
                     })
                     .Build();
             }

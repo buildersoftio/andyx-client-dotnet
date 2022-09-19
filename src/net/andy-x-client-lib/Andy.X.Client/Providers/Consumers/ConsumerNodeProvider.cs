@@ -29,6 +29,7 @@ namespace Andy.X.Client.Abstractions
                              return xClientConfig.HttpClientHandler;
                          };
 
+
                          option.Headers["x-andyx-tenant-authoriziation"] = xClientConfig.TenantToken;
                          option.Headers["x-andyx-component-authoriziation"] = consumerConfig.ComponentToken;
 
@@ -49,7 +50,7 @@ namespace Andy.X.Client.Abstractions
                      .ConfigureLogging(factory =>
                      {
                          factory.AddSystemdConsole();
-                         factory.AddFilter("Console", level => level >= LogLevel.Trace);
+                         factory.AddFilter("Console", level => level >= LogLevel.Information);
                      })
                      .Build();
             }

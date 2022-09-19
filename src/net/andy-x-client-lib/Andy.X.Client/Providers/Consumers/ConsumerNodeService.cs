@@ -19,6 +19,7 @@ namespace Andy.X.Client.Abstractions
             public event Action<ConsumerConnectedArgs> ConsumerConnected;
             public event Action<ConsumerDisconnectedArgs> ConsumerDisconnected;
             public event Action<MessageInternalReceivedArgs> MessageInternalReceived;
+            public event Action<string> AndyOrderedDisconnect;
 
             public ConsumerNodeService(ConsumerNodeProvider consumerNodeProvider,
                 XClientConfiguration xClientConfiguration)
@@ -41,6 +42,8 @@ namespace Andy.X.Client.Abstractions
                 _connection.On<ConsumerConnectedArgs>("ConsumerConnected", connectedArgs => ConsumerConnected?.Invoke(connectedArgs));
                 _connection.On<ConsumerDisconnectedArgs>("ConsumerDisconnected", disconnected => ConsumerDisconnected?.Invoke(disconnected));
                 _connection.On<MessageInternalReceivedArgs>("MessageSent", received => MessageInternalReceived?.Invoke(received));
+
+                _connection.On<string>("AndyOrderedDisconnect", message => AndyOrderedDisconnect?.Invoke(message));
             }
 
             private Task Connection_Reconnecting(Exception arg)
