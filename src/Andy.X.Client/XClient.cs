@@ -1,76 +1,113 @@
 ﻿using Andy.X.Client.Abstractions.XClients;
 using Andy.X.Client.Configurations;
-using Microsoft.Extensions.Logging;
 using System;
-using System.Net.Http;
 
 namespace Andy.X.Client
 {
-    public class XClient : IXClientServiceConnection, IXClientTenantConnection, IXClientProductConnection, IXClientConfiguration
+    public class XClient : IXClient
     {
+        private readonly XClientConfiguration _configuration;
+
         private XClient()
         {
-
+            _configuration = new XClientConfiguration();
         }
 
-        public static IXClientTenantConnection CreateClient()
+        private XClient(XClientConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
+        public static IXClientServiceConnection CreateClient()
         {
             return new XClient();
         }
 
+        public static XClient CreateClient(XClientConfiguration configuration)
+        {
+            return new XClient(configuration);
+        }
+
+        public IXClientConfiguration AndProduct(string product)
+        {
+            _configuration.Product.Name = product;
+
+            return this;
+        }
+
+        public IXClientConfiguration AndProduct(string product, string key, string secret)
+        {
+            _configuration.Product.Name = product;
+            _configuration.Product.Key = key;
+            _configuration.Product.Secret = secret;
+
+            return this;
+        }
+
+        public IXClientProductConnection AndTenant(string tenant)
+        {
+            _configuration.Tenant.Name = tenant;
+
+            return this;
+        }
+
+        public IXClientProductConnection AndTenant(string tenant, string key, string secret)
+        {
+            _configuration.Tenant.Name = tenant;
+            _configuration.Tenant.Key = key;
+            _configuration.Tenant.Secret = secret;
+
+            return this;
+        }
+
         public XClient Build()
         {
-            throw new NotImplementedException();
+            return this;
         }
 
-        IXClientConfiguration IXClientConfiguration.AddLoggingSupport(ILoggerFactory loggerFactory)
+        public IXClientTenantConnection ForService(Uri nodeUrl)
         {
-            throw new NotImplementedException();
+            _configuration.NodeUrl = nodeUrl;
+
+            return this;
         }
 
-        IXClientConfiguration IXClientProductConnection.AndProduct(string product)
+
+        public IXClientTenantConnection ForService(string nodeHostName, int hostPort, NodeConnectionType nodeConnectionType)
         {
-            throw new NotImplementedException();
+            if (nodeConnectionType == NodeConnectionType.NON_SSL)
+                _configuration.NodeUrl = new Uri($"http://{nodeHostName}:{hostPort}");
+            else
+                _configuration.NodeUrl = new Uri($"https://{nodeHostName}:{hostPort}");
+
+            return this;
         }
 
-        IXClientConfiguration IXClientProductConnection.AndProduct(string product, string key, string secret)
+        public IXClientTenantConnection ForService(string nodeHostName, int hostPort, NodeConnectionType nodeConnectionType, bool isSSLCertsSkipped)
         {
-            throw new NotImplementedException();
+            ForService(nodeHostName, hostPort, nodeConnectionType);
+
+            if (isSSLCertsSkipped == true)
+                _configuration.Settings.HttpClientHandler.ServerCertificateCustomValidationCallback +=
+                       (sender, certificate, chain, sslPolicyErrors) => { return true; };
+
+            return this;
         }
 
-        IXClientProductConnection IXClientTenantConnection.AndTenant(string tenant)
+        public IXClientConfiguration WithSettings(Action<XClientSettings> settings)
         {
-            throw new NotImplementedException();
+            settings.Invoke(_configuration.Settings);
+
+            return this;
         }
 
-        IXClientProductConnection IXClientTenantConnection.AndTenant(string tenant, string key, string secret)
+        /// <summary>
+        /// Get ClientConfiguration.
+        /// </summary>
+        /// <returns>Object of XClientConfiguration.</returns>
+        public XClientConfiguration GetClientConfiguration()
         {
-            throw new NotImplementedException();
-        }
-
-        IXClientTenantConnection IXClientServiceConnection.ForService(string nodeUrl)
-        {
-            throw new NotImplementedException();
-        }
-
-        IXClientTenantConnection IXClientServiceConnection.ForService(string nodeHostName, int hostPort)
-        {
-            throw new NotImplementedException();
-        }
-
-        IXClientTenantConnection IXClientServiceConnection.ForService(string nodeHostName, int hostPort, NodeConnectionType nodeConnectionType)
-        {
-            throw new NotImplementedException();
-        }
-
-        IXClientTenantConnection IXClientServiceConnection.ForService(string nodeHostName, int hostPort, NodeConnectionType nodeConnectionType, bool isSSLCertsSkipped)
-        {
-            throw new NotImplementedException();
-        }
-
-        IXClientConfiguration IXClientConfiguration.WithHttpClientHandler(Action<HttpClientHandler> httpHandler)
-        {
-            throw new NotImplementedException();
+            return _configuration;
         }
     }
 }

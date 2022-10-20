@@ -1,7 +1,53 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net6.0;net5;netcoreapp3.1;netstandard2.1;netstandard2.0</TargetFrameworks>
+		<TargetFrameworks>net6.0;net5;netcoreapp3.1;netstandard2.1</TargetFrameworks>
+		<AssemblyVersion>3.0.0</AssemblyVersion>
+		<FileVersion>3.0.0</FileVersion>
+		<Product>Buildersoft Andy X</Product>
+		<Company>Buildersoft</Company>
+		<Authors>Buildersoft</Authors>
+		<Copyright>Copyright © Buildersoft 2022</Copyright>
+		
+		<Description>
+			Andy X Client extensions for ASP.NET Core
+		</Description>
+		
+		<RepositoryUrl>https://github.com/buildersoftdev/andyxclient</RepositoryUrl>
+		<PackageTags>andyx eda streaming distributed</PackageTags>
+
+		<Version>3.0.0</Version>
+		<PackageLicenseFile>license.md</PackageLicenseFile>
+		<PackageIcon>andyX.png</PackageIcon>
+		<PackageId>Andy.X.Client.Extensions.Microsoft.DependencyInjection</PackageId>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<IsPublishable>True</IsPublishable>
+		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+		<RepositoryType></RepositoryType>
+		<PackageProjectUrl>https://buildersoftdev.azurewebsites.net/andyx</PackageProjectUrl>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Andy.X.Client\Andy.X.Client.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="Assets\andyX.png">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+		<None Include="Assets\license.md">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="Assets\" />
+	</ItemGroup>
 
 </Project>

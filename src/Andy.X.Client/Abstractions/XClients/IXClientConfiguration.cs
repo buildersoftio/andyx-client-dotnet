@@ -1,14 +1,11 @@
-﻿using System.Net.Http;
-using System;
-using Microsoft.Extensions.Logging;
+﻿using System;
+using Andy.X.Client.Configurations;
 
 namespace Andy.X.Client.Abstractions.XClients
 {
-    internal interface IXClientConfiguration
+    public interface IXClientConfiguration
     {
-        IXClientConfiguration AddLoggingSupport(ILoggerFactory loggerFactory);
-        IXClientConfiguration WithHttpClientHandler(Action<HttpClientHandler> httpHandler);
-
+        IXClientConfiguration WithSettings(Action<XClientSettings> settings);
         XClient Build();
     }
 }
