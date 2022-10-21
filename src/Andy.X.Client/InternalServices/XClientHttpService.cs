@@ -29,7 +29,9 @@ namespace Andy.X.Client.InternalServices
                 string content = httpResponseMessage.Content.ReadAsStringAsync().Result;
                 if (httpResponseMessage.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    var applicationDetails = JsonSerializer.Deserialize<ApplicationDetails>(content);
+                    var applicationDetails = JsonSerializer.Deserialize<ApplicationDetails>(content,
+                        new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
                     return new XClientConnection(XConnectionState.Open, applicationDetails.Name, applicationDetails.Version);
                 }
 
