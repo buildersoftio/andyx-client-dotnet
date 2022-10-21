@@ -7,7 +7,7 @@ using Andy.X.Client.Configurations;
 
 namespace Andy.X.Client
 {
-    public class Consumer<K, V> : ConsumerBase<K, V>
+    public sealed class Consumer<K, V> : ConsumerBase<K, V>
     {
         private Consumer(IXClient xClient) : base(xClient)
         {

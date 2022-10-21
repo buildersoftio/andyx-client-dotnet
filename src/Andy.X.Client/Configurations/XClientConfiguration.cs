@@ -41,6 +41,8 @@ namespace Andy.X.Client.Configurations
         public int ConnectionTimeoutMs { get; set; }
         public int ReconnectionTimeoutMs { get; set; }
 
+        public bool ShouldCheckOnline { get; set; }
+
 
         public XClientSettings()
         {
@@ -50,6 +52,8 @@ namespace Andy.X.Client.Configurations
             EnableAutoReconnect = true;
             ConnectionTimeoutMs = 10000;
             ReconnectionTimeoutMs = 1000;
+
+            ShouldCheckOnline = true;
         }
     }
 

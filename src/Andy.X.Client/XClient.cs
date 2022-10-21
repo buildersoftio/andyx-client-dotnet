@@ -1,21 +1,23 @@
 ﻿using Andy.X.Client.Abstractions.XClients;
 using Andy.X.Client.Configurations;
+using Andy.X.Client.InternalServices;
 using System;
 
 namespace Andy.X.Client
 {
-    public class XClient : IXClient
+    public sealed class XClient : IXClient
     {
         private readonly XClientConfiguration _configuration;
+        private XClientConnection _clientConnection;
 
-        private XClient()
+        private XClient() : this(new XClientConfiguration())
         {
-            _configuration = new XClientConfiguration();
         }
 
         private XClient(XClientConfiguration configuration)
         {
             _configuration = configuration;
+            _clientConnection = new XClientConnection(state: XConnectionState.Unknown, server: "n/a", version: "n/a");
         }
 
         public static IXClientServiceConnection CreateClient()
@@ -62,6 +64,14 @@ namespace Andy.X.Client
 
         public XClient Build()
         {
+            if (_configuration.Settings.ShouldCheckOnline == true)
+            {
+                var clientHttpService = new XClientHttpService(_configuration);
+                var clientCon = clientHttpService.GetApplicationDetails();
+                if (clientCon != null)
+                    _clientConnection = clientCon;
+            }
+
             return this;
         }
 
@@ -71,7 +81,6 @@ namespace Andy.X.Client
 
             return this;
         }
-
 
         public IXClientTenantConnection ForService(string nodeHostName, int hostPort, NodeConnectionType nodeConnectionType)
         {
@@ -108,6 +117,29 @@ namespace Andy.X.Client
         public XClientConfiguration GetClientConfiguration()
         {
             return _configuration;
+        }
+
+        public XConnectionState GetState()
+        {
+            return _clientConnection.State;
+        }
+
+        public string GetServerName()
+        {
+            return _clientConnection.Server;
+        }
+
+        public string GetServerVersion()
+        {
+            return _clientConnection.Version;
+        }
+
+        public void UpdateConnection()
+        {
+            var clientHttpService = new XClientHttpService(_configuration);
+            var clientCon = clientHttpService.GetApplicationDetails();
+            if (clientCon != null)
+                _clientConnection = clientCon;
         }
     }
 }
