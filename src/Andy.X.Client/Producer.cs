@@ -7,7 +7,7 @@ using Andy.X.Client.Configurations;
 
 namespace Andy.X.Client
 {
-    public sealed class Producer<K, V> : ProducerBase<K, V>
+    public class Producer<K, V> : ProducerBase<K, V>
     {
         private Producer(IXClient xClient) : base(xClient)
         {
