@@ -34,6 +34,33 @@ namespace Andy.X.Client.InternalServices
 
                     return new XClientConnection(XConnectionState.Open, applicationDetails.Name, applicationDetails.Version);
                 }
+            }
+            catch (Exception)
+            {
+
+            }
+
+            return null;
+        }
+
+        public ClusterDetails GetClusterDetails(string username, string password)
+        {
+            _httpClient = new HttpClient(_xClientConfiguration.Settings.HttpClientHandler);
+            _httpClient.DefaultRequestHeaders.Add("x-called-by", ApplicationParameters.LibraryName);
+            _httpClient.AddBasicAuthorizationHeader(username, password);
+
+            string request = $"{_xClientConfiguration.NodeUrl.AbsoluteUri}api/v3/clusters";
+
+            try
+            {
+                HttpResponseMessage httpResponseMessage = _httpClient.GetAsync(request).Result;
+                string content = httpResponseMessage.Content.ReadAsStringAsync().Result;
+                if (httpResponseMessage.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    var clusterDetails = JsonSerializer.Deserialize<ClusterDetails>(content,
+                        new JsonSerializerOptions() { PropertyNameCaseInsensitive = true, });
+                    return clusterDetails;  
+                }
 
                 if (httpResponseMessage.StatusCode == System.Net.HttpStatusCode.Unauthorized ||
                     httpResponseMessage.StatusCode == System.Net.HttpStatusCode.Forbidden)
@@ -47,5 +74,6 @@ namespace Andy.X.Client.InternalServices
 
             return null;
         }
+
     }
 }

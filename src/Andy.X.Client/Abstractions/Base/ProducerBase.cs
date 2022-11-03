@@ -279,11 +279,11 @@ namespace Andy.X.Client.Abstractions.Base
             if (_producerConfiguration.Settings.RequireCallback == true)
             {
                 int milisecondsWait = 0;
-                int sleepTime = 10;
+                int sleepTimeMilisec = 1;
                 while (callBackResponses.ContainsKey(identityId) != true)
                 {
-                    Thread.Sleep(sleepTime);
-                    milisecondsWait += sleepTime;
+                    Thread.Sleep(sleepTimeMilisec);
+                    milisecondsWait += sleepTimeMilisec;
                     if (milisecondsWait >= _producerConfiguration.Settings.TimeoutInSyncResponseMs)
                         throw new Exception($"Run in timeout, couldnot get response from Andy X. TimeoutInSyncResponseMs: {_producerConfiguration.Settings.TimeoutInSyncResponseMs}. You can increase TimeoutInSyncResponseMs at Producer Settings.");
 

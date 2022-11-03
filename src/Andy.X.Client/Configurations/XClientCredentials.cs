@@ -1,15 +1,15 @@
-﻿namespace Andy.X.Client.Configurations
+﻿namespace Andy.X.Security.Credentials
 {
     public sealed class XClientCredentials
     {
         // this class will be needed for getting the cluster configuration.
-        public string Username { get; set; }
-        public string Password { get; set; }
+        public string Username { get; private set; }
+        public string Password { get; private set; }
 
-        public XClientCredentials()
+        public XClientCredentials(string username, string password)
         {
-            Username = "";
-            Password = "";
+            Username = username;
+            Password = password;
         }
     }
 }
