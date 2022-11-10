@@ -33,6 +33,11 @@
 
     public class ConsumerSettings
     {
+        public CompressionType CompressionType { get; set; }
 
+        public ConsumerSettings()
+        {
+            CompressionType = CompressionType.None;
+        }
     }
 }

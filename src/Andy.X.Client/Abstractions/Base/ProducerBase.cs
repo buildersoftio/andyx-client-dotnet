@@ -30,6 +30,8 @@ namespace Andy.X.Client.Abstractions.Base
         private ProducerNodeProvider producerNodeProvider;
         private ConcurrentDictionary<Guid, MessageId> callBackResponses;
 
+        private MessagePackSerializerOptions messagePackSerializerOptions;
+
         private bool isBuilt = false;
 
         #region Constuctors
@@ -109,6 +111,22 @@ namespace Andy.X.Client.Abstractions.Base
             if (_producerConfiguration.Settings.RequireCallback == true)
                 callBackResponses = new ConcurrentDictionary<Guid, MessageId>();
 
+            switch (_producerConfiguration.Settings.CompressionType)
+            {
+                case CompressionType.None:
+                    messagePackSerializerOptions = MessagePack.Resolvers.ContractlessStandardResolver.Options.WithCompression(MessagePackCompression.None);
+                    break;
+                case CompressionType.Lz4Block:
+                    messagePackSerializerOptions = MessagePack.Resolvers.ContractlessStandardResolver.Options.WithCompression(MessagePackCompression.Lz4Block);
+                    break;
+                case CompressionType.Lz4BlockArray:
+                    messagePackSerializerOptions = MessagePack.Resolvers.ContractlessStandardResolver.Options.WithCompression(MessagePackCompression.Lz4BlockArray);
+                    break;
+                default:
+                    messagePackSerializerOptions = MessagePack.Resolvers.ContractlessStandardResolver.Options.WithCompression(MessagePackCompression.None);
+                    break;
+            }
+
             _headers.Add("andyx-client", "Andy X Client for .NET");
             _headers.Add("andyx-client-version", "v3.0.0-alpha10");
             _headers.Add("andyx-producer-name", _producerConfiguration.Name);
@@ -185,8 +203,8 @@ namespace Andy.X.Client.Abstractions.Base
                     IdentityId = identityId,
                     Headers = headers as Dictionary<string, string>,
 
-                    Id = MessagePackSerializer.Serialize(id, MessagePack.Resolvers.ContractlessStandardResolver.Options),
-                    Payload = MessagePackSerializer.Serialize(message, MessagePack.Resolvers.ContractlessStandardResolver.Options),
+                    Id = MessagePackSerializer.Serialize(id, messagePackSerializerOptions),
+                    Payload = MessagePackSerializer.Serialize(message, messagePackSerializerOptions),
                     SentDate = DateTimeOffset.UtcNow,
 
                     NodeId = sendNodeId,
@@ -225,8 +243,8 @@ namespace Andy.X.Client.Abstractions.Base
                         IdentityId = identityId,
                         Headers = headers as Dictionary<string, string>,
 
-                        Id = MessagePackSerializer.Serialize(message.Key, MessagePack.Resolvers.ContractlessStandardResolver.Options),
-                        Payload = MessagePackSerializer.Serialize(message.Value, MessagePack.Resolvers.ContractlessStandardResolver.Options),
+                        Id = MessagePackSerializer.Serialize(message.Key, messagePackSerializerOptions),
+                        Payload = MessagePackSerializer.Serialize(message.Value, messagePackSerializerOptions),
                         SentDate = DateTimeOffset.UtcNow,
 
                         NodeId = sendNodeId,
