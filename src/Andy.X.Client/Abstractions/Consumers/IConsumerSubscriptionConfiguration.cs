@@ -5,6 +5,6 @@ namespace Andy.X.Client.Abstractions.Consumers
 {
     public interface IConsumerSubscriptionConfiguration<K, V>
     {
-        IConsumerSettings<K, V> AndSubscription(Action<SubscriptionConfiguration> config);
+        IConsumerConfiguration<K, V> AndSubscription(Action<SubscriptionConfiguration> config);
     }
 }
