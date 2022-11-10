@@ -62,7 +62,7 @@ namespace Andy.X.Client.Abstractions.Base
         }
 
 
-        public IConsumerSettings<K, V> AndSubscription(Action<SubscriptionConfiguration> config)
+        public IConsumerConfiguration<K, V> AndSubscription(Action<SubscriptionConfiguration> config)
         {
             config.Invoke(_consumerConfiguration.Subscription);
 

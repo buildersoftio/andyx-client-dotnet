@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Andy.X.Client.Abstractions.Consumers
 {
-    public interface IConsumer<K, V> : IConsumerComponentConnection<K, V>, IConsumerConfiguration<K, V>, IConsumerConnection<K, V>, IConsumerSubscriptionConfiguration<K, V>, IConsumerTopicConnection<K, V>, IConsumerMessageHandler<K, V>, IConsumerSettings<K, V>
+    public interface IConsumer<K, V> : IConsumerComponentConnection<K, V>, IConsumerConfiguration<K, V>, IConsumerConnection<K, V>, IConsumerSubscriptionConfiguration<K, V>, IConsumerTopicConnection<K, V>, IConsumerMessageHandler<K, V>
     {
         IConsumerMessageHandler<K, V> MessageReceivedHandler(Action<K, Message<V>> messageReceived);
 
