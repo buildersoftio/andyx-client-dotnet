@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using MessagePack;
+using System.Collections.Generic;
 
 namespace Andy.X.Client.Configurations
 {
@@ -46,6 +47,8 @@ namespace Andy.X.Client.Configurations
 
         public bool RequireCallback { get; set; }
 
+        public CompressionType CompressionType { get; set; }
+
         public ProducerSettings()
         {
             EnableRetryProducing = false;
@@ -55,6 +58,8 @@ namespace Andy.X.Client.Configurations
             TimeoutInSyncResponseMs = 3000;
             BreakIfTryToSendMessageInClosedConneciton = false;
             RequireCallback = true;
+
+            CompressionType = CompressionType.None;
         }
     }
 }
