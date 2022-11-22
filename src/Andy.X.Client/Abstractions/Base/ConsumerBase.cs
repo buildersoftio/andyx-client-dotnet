@@ -15,7 +15,6 @@ namespace Andy.X.Client.Abstractions.Base
 {
     public abstract class ConsumerBase<K, V> : IConsumer<K, V>
     {
-
         private Action<K, Message<V>> _clientAction;
 
         private readonly ILogger _logger;

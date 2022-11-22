@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net6.0;net5;netcoreapp3.1;netstandard2.1</TargetFrameworks>
+		<TargetFrameworks>net7.0;net6.0;net5;netcoreapp3.1;netstandard2.1</TargetFrameworks>
 
 		<AssemblyVersion>3.0.0</AssemblyVersion>
 		<FileVersion>3.0.0</FileVersion>
@@ -11,8 +11,8 @@
 		<Copyright>Copyright © Buildersoft 2022</Copyright>
 
 		<Description>
-			Andy X is an open-source distributed streaming platform designed to deliver the best performance possible for high-performance data pipelines, streaming analytics, streaming between microservices and data integrations.
-			This library offers flexible messaging models with high-level APIs for NET.
+Andy X is an open-source distributed streaming platform designed to deliver the best performance possible for high-performance data pipelines, streaming analytics, streaming between microservices and data integrations.
+This library offers flexible messaging models with high-level APIs for NET.
 		</Description>
 
 		<RepositoryUrl>https://github.com/buildersoftdev/andyxclient</RepositoryUrl>
@@ -28,6 +28,7 @@
 		<RepositoryType></RepositoryType>
 		<PackageReleaseNotes>Added support to check client connectivity online while building the Client. Here is totally new library developed for Andy X v3.</PackageReleaseNotes>
 		<PackageProjectUrl>https://buildersoftdev.azurewebsites.net/andyx</PackageProjectUrl>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 
 	</PropertyGroup>
 
@@ -44,6 +45,10 @@
 
 
 	<ItemGroup>
+		<None Include="..\..\README.md">
+		  <Pack>True</Pack>
+		  <PackagePath>\</PackagePath>
+		</None>
 		<None Include="Assets\andyX.png">
 			<Pack>True</Pack>
 			<PackagePath></PackagePath>

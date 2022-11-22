@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net6.0;net5;netcoreapp3.1;netstandard2.1</TargetFrameworks>
+		<TargetFrameworks>net7.0;net6.0;net5;netcoreapp3.1;netstandard2.1</TargetFrameworks>
 		<AssemblyVersion>3.0.0</AssemblyVersion>
 		<FileVersion>3.0.0</FileVersion>
 		<Product>Buildersoft Andy X</Product>
@@ -10,7 +10,7 @@
 		<Copyright>Copyright © Buildersoft 2022</Copyright>
 		
 		<Description>
-			Andy X Client extensions for ASP.NET Core
+Andy X Client extensions for ASP.NET Core
 		</Description>
 		
 		<RepositoryUrl>https://github.com/buildersoftdev/andyxclient</RepositoryUrl>
@@ -25,6 +25,7 @@
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 		<RepositoryType></RepositoryType>
 		<PackageProjectUrl>https://buildersoftdev.azurewebsites.net/andyx</PackageProjectUrl>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -36,6 +37,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<None Include="..\..\README.md">
+		  <Pack>True</Pack>
+		  <PackagePath>\</PackagePath>
+		</None>
 		<None Include="Assets\andyX.png">
 			<Pack>True</Pack>
 			<PackagePath></PackagePath>
