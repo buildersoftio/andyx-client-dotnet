@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/10813728/202870468-20d05267-a8e6-4f93-a579-f249b8bd1268.png" alt="Andy X Logo"/>
+</p>
+
 What is Andy X Client?
 ============
 Andy X is an open-source distributed streaming platform designed to deliver the best performance possible for high-performance data pipelines, streaming analytics, streaming between microservices and data integrations.
@@ -16,7 +20,7 @@ and make pull-requests.
 
 ## Reporting security issues and bugs
 
-Security issues and bugs should be reported privately, via email, en.buildersoft@gmail.com. You should receive a response within 24 hours.
+Security issues and bugs should be reported privately, via email, support@buildersoft.io. You should receive a response within 24 hours.
 
 ## Related projects
 
