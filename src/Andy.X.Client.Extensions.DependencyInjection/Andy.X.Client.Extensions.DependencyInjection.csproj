@@ -16,13 +16,14 @@ Andy X Client extensions for ASP.NET Core
 		<RepositoryUrl>https://github.com/buildersoftdev/andyxclient</RepositoryUrl>
 		<PackageTags>andyx eda streaming distributed</PackageTags>
 
-		<Version>3.1.0</Version>
+		<Version>3.0.1</Version>
 		<PackageLicenseFile>license.md</PackageLicenseFile>
 		<PackageIcon>andyX.png</PackageIcon>
 		<PackageId>Andy.X.Client.Extensions.Microsoft.DependencyInjection</PackageId>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<IsPublishable>True</IsPublishable>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+		<PackageReleaseNotes>Added support for Custom Serialization; Added support for Transport Logging; General bug fixes</PackageReleaseNotes>
 		<RepositoryType></RepositoryType>
 		<PackageProjectUrl>https://buildersoftdev.azurewebsites.net/andyx</PackageProjectUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
