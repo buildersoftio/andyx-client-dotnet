@@ -1,4 +1,5 @@
-﻿using MessagePack;
+﻿using Andy.X.Client.Abstractions.Serializers;
+using MessagePack;
 using System.Collections.Generic;
 
 namespace Andy.X.Client.Configurations
@@ -38,6 +39,8 @@ namespace Andy.X.Client.Configurations
 
     public class ProducerSettings
     {
+        public IMessageSerializer MessageSerializer { get; private set; } = null;
+
         public bool EnableRetryProducing { get; set; }
         public bool BreakIfTryToSendMessageInClosedConneciton { get; set; }
         public int BatchSize { get; set; }
@@ -60,6 +63,11 @@ namespace Andy.X.Client.Configurations
             RequireCallback = true;
 
             CompressionType = CompressionType.None;
+        }
+
+        public void AddCustomMessageSerializer(IMessageSerializer messageSerializer)
+        {
+            MessageSerializer = messageSerializer;
         }
     }
 }

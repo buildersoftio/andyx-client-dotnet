@@ -1,10 +1,12 @@
 ﻿using Andy.X.Client.Abstractions.Consumers;
+using Andy.X.Client.Abstractions.Serializers;
 using Andy.X.Client.Abstractions.XClients;
 using Andy.X.Client.Builders;
 using Andy.X.Client.Commands;
 using Andy.X.Client.Configurations;
 using Andy.X.Client.Models;
 using Andy.X.Client.Providers;
+using Andy.X.Client.Serializers;
 using Andy.X.Client.Services;
 using MessagePack;
 using Microsoft.Extensions.Logging;
@@ -23,9 +25,6 @@ namespace Andy.X.Client.Abstractions.Base
 
         private ConsumerNodeProvider consumerNodeProvider;
         private ConsumerNodeService consumerNodeService;
-
-        private MessagePackSerializerOptions messagePackSerializerOptions;
-
 
         private bool isBuilt = false;
 
@@ -128,21 +127,8 @@ namespace Andy.X.Client.Abstractions.Base
             consumerNodeProvider = new ConsumerNodeProvider(_xClient.GetClientConfiguration(), _consumerConfiguration);
             consumerNodeService = new ConsumerNodeService(consumerNodeProvider, _xClient.GetClientConfiguration());
 
-            switch (_consumerConfiguration.Settings.CompressionType)
-            {
-                case CompressionType.None:
-                    messagePackSerializerOptions = MessagePack.Resolvers.ContractlessStandardResolver.Options.WithCompression(MessagePackCompression.None);
-                    break;
-                case CompressionType.Lz4Block:
-                    messagePackSerializerOptions = MessagePack.Resolvers.ContractlessStandardResolver.Options.WithCompression(MessagePackCompression.Lz4Block);
-                    break;
-                case CompressionType.Lz4BlockArray:
-                    messagePackSerializerOptions = MessagePack.Resolvers.ContractlessStandardResolver.Options.WithCompression(MessagePackCompression.Lz4BlockArray);
-                    break;
-                default:
-                    messagePackSerializerOptions = MessagePack.Resolvers.ContractlessStandardResolver.Options.WithCompression(MessagePackCompression.None);
-                    break;
-            }
+            if (_consumerConfiguration.Settings.MessageSerializer == null)
+                _consumerConfiguration.Settings.AddCustomMessageSerializer(new DefaultContractlessMessageSerializer(_consumerConfiguration.Settings.CompressionType));
 
             consumerNodeService.ConsumerConnected += ConsumerNodeService_ConsumerConnected;
             consumerNodeService.ConsumerDisconnected += ConsumerNodeService_ConsumerDisconnected;
@@ -187,8 +173,7 @@ namespace Andy.X.Client.Abstractions.Base
 
         private void ConsumerNodeService_MessageInternalReceived(Events.Consumers.MessageInternalReceivedArgs obj)
         {
-            K keyParsed = MessagePackSerializer.Deserialize<K>(obj.MessageId, messagePackSerializerOptions);
-            V valueParsed = MessagePackSerializer.Deserialize<V>(obj.Payload, messagePackSerializerOptions);
+            (K keyParsed, V valueParsed) = _consumerConfiguration.Settings.MessageSerializer.Deserialize<K, V>(obj.MessageId, obj.Payload);
 
             _clientAction?.Invoke(keyParsed,
                 new Message<V>(
