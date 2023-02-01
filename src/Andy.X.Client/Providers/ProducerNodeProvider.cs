@@ -54,12 +54,13 @@ namespace Andy.X.Client.Providers
             if (_xClientConfiguration.Settings.EnableAutoReconnect)
                 _hubConnectionBuilder.WithAutomaticReconnect();
 
-            // adding logging only for testing purposes.
-            _hubConnectionBuilder.ConfigureLogging(builder =>
+            if (_xClientConfiguration.Settings.Logging.GetTransportLoggingBuilder() != null)
             {
-                builder.AddSystemdConsole();
-                builder.AddFilter("Console", level => level >= LogLevel.Information);
-            });
+                _hubConnectionBuilder.ConfigureLogging(builder =>
+                {
+                    builder = _xClientConfiguration.Settings.Logging.GetTransportLoggingBuilder();
+                });
+            }
 
 
             _connection = _hubConnectionBuilder

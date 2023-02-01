@@ -60,6 +60,8 @@ namespace Andy.X.Client.Configurations
     public class LoggingConfiguration
     {
         private readonly ILoggerFactory _loggerFactory = null;
+        private ILoggingBuilder _loggingBuilder;
+
 
         public LoggingConfiguration() : this(new LoggerFactory())
         {
@@ -71,9 +73,19 @@ namespace Andy.X.Client.Configurations
             _loggerFactory = loggerFactory;
         }
 
+        public void AddTransportLogging(ILoggingBuilder loggingBuilder)
+        {
+            _loggingBuilder = loggingBuilder;
+        }
+
         public ILoggerFactory GetLoggerFactory()
         {
             return _loggerFactory;
+        }
+
+        public ILoggingBuilder GetTransportLoggingBuilder()
+        {
+            return _loggingBuilder;
         }
     }
 

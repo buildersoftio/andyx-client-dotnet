@@ -3,12 +3,12 @@
 	<PropertyGroup>
 		<TargetFrameworks>net7.0;net6.0;net5;netcoreapp3.1;netstandard2.1</TargetFrameworks>
 
-		<AssemblyVersion>3.1.0</AssemblyVersion>
-		<FileVersion>3.1.0</FileVersion>
+		<AssemblyVersion>3.0.1</AssemblyVersion>
+		<FileVersion>3.0.1</FileVersion>
 		<Product>Buildersoft Andy X</Product>
 		<Company>Buildersoft</Company>
 		<Authors>Buildersoft</Authors>
-		<Copyright>Copyright © Buildersoft 2022</Copyright>
+		<Copyright>Copyright © Buildersoft 2023</Copyright>
 
 		<Description>
 Andy X is an open-source distributed streaming platform designed to deliver the best performance possible for high-performance data pipelines, streaming analytics, streaming between microservices and data integrations.
@@ -18,7 +18,7 @@ This library offers flexible messaging models with high-level APIs for NET.
 		<RepositoryUrl>https://github.com/buildersoftdev/andyxclient</RepositoryUrl>
 		<PackageTags>andyx eda streaming distributed</PackageTags>
 
-		<Version>3.1.0</Version>
+		<Version>3.0.1</Version>
 		<PackageLicenseFile>license.md</PackageLicenseFile>
 		<PackageIcon>andyX.png</PackageIcon>
 		<PackageId>Buildersoft.Andy.X.Client</PackageId>
