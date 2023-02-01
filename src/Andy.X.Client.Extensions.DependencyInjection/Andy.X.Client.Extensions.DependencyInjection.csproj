@@ -2,8 +2,8 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>net7.0;net6.0;net5;netcoreapp3.1;netstandard2.1</TargetFrameworks>
-		<AssemblyVersion>3.0.0</AssemblyVersion>
-		<FileVersion>3.0.0</FileVersion>
+		<AssemblyVersion>3.1.0</AssemblyVersion>
+		<FileVersion>3.1.0</FileVersion>
 		<Product>Buildersoft Andy X</Product>
 		<Company>Buildersoft</Company>
 		<Authors>Buildersoft</Authors>
@@ -16,7 +16,7 @@ Andy X Client extensions for ASP.NET Core
 		<RepositoryUrl>https://github.com/buildersoftdev/andyxclient</RepositoryUrl>
 		<PackageTags>andyx eda streaming distributed</PackageTags>
 
-		<Version>3.0.0</Version>
+		<Version>3.1.0</Version>
 		<PackageLicenseFile>license.md</PackageLicenseFile>
 		<PackageIcon>andyX.png</PackageIcon>
 		<PackageId>Andy.X.Client.Extensions.Microsoft.DependencyInjection</PackageId>
