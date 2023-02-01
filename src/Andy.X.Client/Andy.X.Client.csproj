@@ -26,7 +26,7 @@ This library offers flexible messaging models with high-level APIs for NET.
 		<IsPublishable>True</IsPublishable>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 		<RepositoryType></RepositoryType>
-		<PackageReleaseNotes>Added support to check client connectivity online while building the Client. Here is totally new library developed for Andy X v3.</PackageReleaseNotes>
+		<PackageReleaseNotes>Added support for Custom Serialization; Added support for Transport Logging; General bug fixes</PackageReleaseNotes>
 		<PackageProjectUrl>https://buildersoftdev.azurewebsites.net/andyx</PackageProjectUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 
