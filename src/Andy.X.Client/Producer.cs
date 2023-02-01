@@ -29,7 +29,7 @@ namespace Andy.X.Client
         {
         }
 
-        public static IProducerComponentConnection<K, V> CreateNewProducer(IXClientFactory xClientFactory, ProducerConfiguration producerConfiguration)
+        public static IProducerConfiguration<K, V> CreateNewProducer(IXClientFactory xClientFactory, ProducerConfiguration producerConfiguration)
         {
             return new Producer<K, V>(xClientFactory, producerConfiguration);
         }
@@ -37,7 +37,8 @@ namespace Andy.X.Client
         private Producer(IXClientFactory xClientFactory, ProducerBuilder<K, V> producerBuilder) : base(xClientFactory, producerBuilder)
         {
         }
-        public static IProducerComponentConnection<K, V> CreateNewProducer(IXClientFactory xClientFactory, ProducerBuilder<K, V> producerBuilder)
+
+        public static IProducerConfiguration<K, V> CreateNewProducer(IXClientFactory xClientFactory, ProducerBuilder<K, V> producerBuilder)
         {
             return new Producer<K, V>(xClientFactory, producerBuilder);
         }
@@ -45,7 +46,7 @@ namespace Andy.X.Client
         private Producer(XClient xClient, ProducerConfiguration producerConfiguration) : base(xClient, producerConfiguration)
         {
         }
-        public static IProducerComponentConnection<K, V> CreateNewProducer(XClient xClient, ProducerConfiguration producerConfiguration)
+        public static IProducerConfiguration<K, V> CreateNewProducer(XClient xClient, ProducerConfiguration producerConfiguration)
         {
             return new Producer<K, V>(xClient, producerConfiguration);
         }

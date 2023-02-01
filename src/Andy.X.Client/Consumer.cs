@@ -28,7 +28,7 @@ namespace Andy.X.Client
         private Consumer(IXClientFactory xClientFactory, ConsumerConfiguration consumerConfiguration) : base(xClientFactory, consumerConfiguration)
         {
         }
-        public static IConsumerComponentConnection<K, V> CreateNewConsumer(IXClientFactory xClientFactory, ConsumerConfiguration consumerConfiguration)
+        public static IConsumerConfiguration<K, V> CreateNewConsumer(IXClientFactory xClientFactory, ConsumerConfiguration consumerConfiguration)
         {
             return new Consumer<K, V>(xClientFactory, consumerConfiguration);
         }
@@ -36,7 +36,7 @@ namespace Andy.X.Client
         private Consumer(IXClientFactory xClientFactory, ConsumerBuilder<K, V> consumerBuilder) : base(xClientFactory, consumerBuilder)
         {
         }
-        public static IConsumerComponentConnection<K, V> CreateNewConsumer(IXClientFactory xClientFactory, ConsumerBuilder<K, V> consumerBuilder)
+        public static IConsumerConfiguration<K, V> CreateNewConsumer(IXClientFactory xClientFactory, ConsumerBuilder<K, V> consumerBuilder)
         {
             return new Consumer<K, V>(xClientFactory, consumerBuilder);
         }
@@ -44,7 +44,7 @@ namespace Andy.X.Client
         private Consumer(XClient xClient, ConsumerConfiguration consumerConfiguration) : base(xClient, consumerConfiguration)
         {
         }
-        public static IConsumerComponentConnection<K, V> CreateNewConsumer(XClient xClient, ConsumerConfiguration consumerConfiguration)
+        public static IConsumerConfiguration<K, V> CreateNewConsumer(XClient xClient, ConsumerConfiguration consumerConfiguration)
         {
             return new Consumer<K, V>(xClient, consumerConfiguration);
         }
