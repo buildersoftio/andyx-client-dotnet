@@ -1,10 +1,12 @@
 ﻿using Andy.X.Client.Abstractions.Producers;
+using Andy.X.Client.Abstractions.Serializers;
 using Andy.X.Client.Abstractions.XClients;
 using Andy.X.Client.Builders;
 using Andy.X.Client.Commands;
 using Andy.X.Client.Configurations;
 using Andy.X.Client.Models;
 using Andy.X.Client.Providers;
+using Andy.X.Client.Serializers;
 using Andy.X.Client.Services;
 using MessagePack;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -29,8 +31,6 @@ namespace Andy.X.Client.Abstractions.Base
         private ProducerNodeService producerNodeService;
         private ProducerNodeProvider producerNodeProvider;
         private ConcurrentDictionary<Guid, MessageId> callBackResponses;
-
-        private MessagePackSerializerOptions messagePackSerializerOptions;
 
         private bool isBuilt = false;
 
@@ -111,24 +111,11 @@ namespace Andy.X.Client.Abstractions.Base
             if (_producerConfiguration.Settings.RequireCallback == true)
                 callBackResponses = new ConcurrentDictionary<Guid, MessageId>();
 
-            switch (_producerConfiguration.Settings.CompressionType)
-            {
-                case CompressionType.None:
-                    messagePackSerializerOptions = MessagePack.Resolvers.ContractlessStandardResolver.Options.WithCompression(MessagePackCompression.None);
-                    break;
-                case CompressionType.Lz4Block:
-                    messagePackSerializerOptions = MessagePack.Resolvers.ContractlessStandardResolver.Options.WithCompression(MessagePackCompression.Lz4Block);
-                    break;
-                case CompressionType.Lz4BlockArray:
-                    messagePackSerializerOptions = MessagePack.Resolvers.ContractlessStandardResolver.Options.WithCompression(MessagePackCompression.Lz4BlockArray);
-                    break;
-                default:
-                    messagePackSerializerOptions = MessagePack.Resolvers.ContractlessStandardResolver.Options.WithCompression(MessagePackCompression.None);
-                    break;
-            }
+            if (_producerConfiguration.Settings.MessageSerializer == null)
+                _producerConfiguration.Settings.AddCustomMessageSerializer(new DefaultContractlessMessageSerializer(_producerConfiguration.Settings.CompressionType));
 
             _headers.Add("andyx-client", "Andy X Client for .NET");
-            _headers.Add("andyx-client-version", "v3.0.0-alpha10");
+            _headers.Add("andyx-client-version", "v3.1.0");
             _headers.Add("andyx-producer-name", _producerConfiguration.Name);
             _headers.Add("andyx-content-type", "application/andyxbinary+json");
 
@@ -193,23 +180,8 @@ namespace Andy.X.Client.Abstractions.Base
 
             if (producerNodeService.GetConnectionState() == HubConnectionState.Connected)
             {
-                await producerNodeService.TransmitMessage(new TransmitMessageArgs()
-                {
-                    Tenant = _xClient.GetClientConfiguration().Tenant.Name,
-                    Product = _xClient.GetClientConfiguration().Product.Name,
-                    Component = _producerConfiguration.Component.Name,
-                    Topic = _producerConfiguration.Topic.Name,
-
-                    IdentityId = identityId,
-                    Headers = headers as Dictionary<string, string>,
-
-                    Id = MessagePackSerializer.Serialize(id, messagePackSerializerOptions),
-                    Payload = MessagePackSerializer.Serialize(message, messagePackSerializerOptions),
-                    SentDate = DateTimeOffset.UtcNow,
-
-                    NodeId = sendNodeId,
-                    RequiresCallback = _producerConfiguration.Settings.RequireCallback
-                });
+                TransmitMessageArgs transmitMessage = CreateTransmitMessage(id, message, headers, sendNodeId, identityId);
+                await producerNodeService.TransmitMessage(transmitMessage);
             }
             else
             {
@@ -233,23 +205,8 @@ namespace Andy.X.Client.Abstractions.Base
             {
                 foreach (var message in messages)
                 {
-                    messagesArgs.Add(new TransmitMessageArgs()
-                    {
-                        Tenant = _xClient.GetClientConfiguration().Tenant.Name,
-                        Product = _xClient.GetClientConfiguration().Product.Name,
-                        Component = _producerConfiguration.Component.Name,
-                        Topic = _producerConfiguration.Topic.Name,
-
-                        IdentityId = identityId,
-                        Headers = headers as Dictionary<string, string>,
-
-                        Id = MessagePackSerializer.Serialize(message.Key, messagePackSerializerOptions),
-                        Payload = MessagePackSerializer.Serialize(message.Value, messagePackSerializerOptions),
-                        SentDate = DateTimeOffset.UtcNow,
-
-                        NodeId = sendNodeId,
-                        RequiresCallback = _producerConfiguration.Settings.RequireCallback
-                    });
+                    var transmitMessage = CreateTransmitMessage(message.Key, message.Value, headers, sendNodeId, identityId);
+                    messagesArgs.Add(transmitMessage);
                 }
 
                 await producerNodeService.TransmitMessages(messagesArgs);
@@ -311,5 +268,29 @@ namespace Andy.X.Client.Abstractions.Base
 
             return result;
         }
+
+
+        private TransmitMessageArgs CreateTransmitMessage(K id, V message, IDictionary<string, string> headers, string sendNodeId, Guid identityId)
+        {
+            var transmitMessage = new TransmitMessageArgs()
+            {
+                Tenant = _xClient.GetClientConfiguration().Tenant.Name,
+                Product = _xClient.GetClientConfiguration().Product.Name,
+                Component = _producerConfiguration.Component.Name,
+                Topic = _producerConfiguration.Topic.Name,
+
+                IdentityId = identityId,
+                Headers = headers as Dictionary<string, string>,
+
+                SentDate = DateTimeOffset.UtcNow,
+
+                NodeId = sendNodeId,
+                RequiresCallback = _producerConfiguration.Settings.RequireCallback
+            };
+
+            (transmitMessage.Id, transmitMessage.Payload) = _producerConfiguration.Settings.MessageSerializer.Serialize(id, message);
+            return transmitMessage;
+        }
+
     }
 }

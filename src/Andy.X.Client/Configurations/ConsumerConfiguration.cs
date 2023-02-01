@@ -1,4 +1,6 @@
-﻿namespace Andy.X.Client.Configurations
+﻿using Andy.X.Client.Abstractions.Serializers;
+
+namespace Andy.X.Client.Configurations
 {
     public class ConsumerConfiguration
     {
@@ -33,11 +35,18 @@
 
     public class ConsumerSettings
     {
+        public IMessageSerializer MessageSerializer { get; private set; } = null;
+
         public CompressionType CompressionType { get; set; }
 
         public ConsumerSettings()
         {
             CompressionType = CompressionType.None;
+        }
+
+        public void AddCustomMessageSerializer(IMessageSerializer messageSerializer)
+        {
+            MessageSerializer = messageSerializer;
         }
     }
 }
