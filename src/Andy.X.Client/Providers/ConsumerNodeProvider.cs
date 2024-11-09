@@ -60,13 +60,6 @@ namespace Andy.X.Client.Providers
             if (_xClientConfiguration.Settings.EnableAutoReconnect)
                 _hubConnectionBuilder.WithAutomaticReconnect();
 
-            // adding logging only for testing purposes.
-            _hubConnectionBuilder.ConfigureLogging(builder =>
-            {
-                builder.AddSystemdConsole();
-                builder.AddFilter("Console", level => level >= LogLevel.Information);
-            });
-
             _connection = _hubConnectionBuilder
                 .Build();
         }

@@ -3,8 +3,8 @@
 	<PropertyGroup>
 		<TargetFrameworks>net9;net8;net7.0</TargetFrameworks>
 
-		<AssemblyVersion>3.0.4</AssemblyVersion>
-		<FileVersion>3.0.4</FileVersion>
+		<AssemblyVersion>3.0.5</AssemblyVersion>
+		<FileVersion>3.0.5</FileVersion>
 		<Product>Buildersoft Andy X</Product>
 		<Company>Buildersoft</Company>
 		<Authors>Buildersoft</Authors>
@@ -18,7 +18,7 @@ This library offers flexible messaging models with high-level APIs for NET.
 		<RepositoryUrl>https://github.com/buildersoftio/andyxclient</RepositoryUrl>
 		<PackageTags>andyx eda streaming distributed</PackageTags>
 
-		<Version>3.0.4</Version>
+		<Version>3.0.5</Version>
 		<PackageLicenseFile>license.md</PackageLicenseFile>
 		<PackageIcon>andyX.png</PackageIcon>
 		<PackageId>Buildersoft.Andy.X.Client</PackageId>
