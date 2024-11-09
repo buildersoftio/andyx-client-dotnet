@@ -214,7 +214,7 @@ namespace Andy.X.Client.Abstractions.Base
 
         private void ConsumerNodeService_ConsumerConnected(Events.Consumers.ConsumerConnectedArgs obj)
         {
-            _logger.LogWarning($"andyx-client  | Consumer '{obj.ConsumerName}|{obj.Id}' is connected");
+            _logger.LogInformation($"andyx-client  | Consumer '{obj.ConsumerName}|{obj.Id}' is connected");
         }
     }
 }
