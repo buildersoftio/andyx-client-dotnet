@@ -2,7 +2,6 @@
 using Andy.X.Client.Utilities.Helpers;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace Andy.X.Client.Providers
 {
@@ -53,13 +52,6 @@ namespace Andy.X.Client.Providers
 
             if (_xClientConfiguration.Settings.EnableAutoReconnect)
                 _hubConnectionBuilder.WithAutomaticReconnect();
-
-            // adding logging only for testing purposes.
-            _hubConnectionBuilder.ConfigureLogging(builder =>
-            {
-                builder.AddSystemdConsole();
-                builder.AddFilter("Console", level => level >= LogLevel.Information);
-            });
 
 
             _connection = _hubConnectionBuilder

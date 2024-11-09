@@ -128,7 +128,7 @@ namespace Andy.X.Client.Abstractions.Base
             }
 
             _headers.Add("andyx-client", "Andy X SDK for .NET");
-            _headers.Add("andyx-client-version", "v3.0.4");
+            _headers.Add("andyx-client-version", "v3.0.5");
             _headers.Add("andyx-producer-name", _producerConfiguration.Name);
             _headers.Add("andyx-content-type", "application/andyxbinary+json");
 
