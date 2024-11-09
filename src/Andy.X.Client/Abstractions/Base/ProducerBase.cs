@@ -127,8 +127,8 @@ namespace Andy.X.Client.Abstractions.Base
                     break;
             }
 
-            _headers.Add("andyx-client", "Andy X Client for .NET");
-            _headers.Add("andyx-client-version", "v3.0.0-alpha10");
+            _headers.Add("andyx-client", "Andy X SDK for .NET");
+            _headers.Add("andyx-client-version", "v3.0.4");
             _headers.Add("andyx-producer-name", _producerConfiguration.Name);
             _headers.Add("andyx-content-type", "application/andyxbinary+json");
 
@@ -164,7 +164,7 @@ namespace Andy.X.Client.Abstractions.Base
 
         private void ProducerNodeService_ProducerConnected(Events.Producers.ProducerConnectedArgs obj)
         {
-            _logger.LogWarning($"andyx-client  | Producer '{obj.ProducerName}|{obj.Id}' is connected");
+            _logger.LogInformation($"andyx-client  | Producer '{obj.ProducerName}|{obj.Id}' is connected");
         }
 
         public async Task CloseAsync()
@@ -214,7 +214,7 @@ namespace Andy.X.Client.Abstractions.Base
             else
             {
                 if (_producerConfiguration.Settings.BreakIfTryToSendMessageInClosedConneciton == true)
-                    throw new Exception($"Connection with Andy X is not establised, message is not produced, connectionState: {producerNodeService.GetConnectionState()}. To ignore and not to throw an exception, update Producer Settings 'BreakIfTryToSendMessageInClosedConneciton' to false");
+                    throw new Exception($"Connection with Andy X is not established, message is not produced, connectionState: {producerNodeService.GetConnectionState()}. To ignore and not to throw an exception, update Producer Settings 'BreakIfTryToSendMessageInClosedConneciton' to false");
             }
 
             return CheckForCallbackResponse(identityId, result);
@@ -257,7 +257,7 @@ namespace Andy.X.Client.Abstractions.Base
             else
             {
                 if (_producerConfiguration.Settings.BreakIfTryToSendMessageInClosedConneciton == true)
-                    throw new Exception($"Connection with Andy X is not establised, messages are not produced, connectionState: {producerNodeService.GetConnectionState()}. To ignore and not to throw an exception, update Producer Settings 'BreakIfTryToSendMessageInClosedConneciton' to false");
+                    throw new Exception($"Connection with Andy X is not established, messages are not produced, connectionState: {producerNodeService.GetConnectionState()}. To ignore and not to throw an exception, update Producer Settings 'BreakIfTryToSendMessageInClosedConneciton' to false");
             }
 
             return CheckForCallbackResponse(identityId, result);
@@ -303,7 +303,7 @@ namespace Andy.X.Client.Abstractions.Base
                     Thread.Sleep(sleepTimeMilisec);
                     milisecondsWait += sleepTimeMilisec;
                     if (milisecondsWait >= _producerConfiguration.Settings.TimeoutInSyncResponseMs)
-                        throw new Exception($"Run in timeout, couldnot get response from Andy X. TimeoutInSyncResponseMs: {_producerConfiguration.Settings.TimeoutInSyncResponseMs}. You can increase TimeoutInSyncResponseMs at Producer Settings.");
+                        throw new Exception($"Run in timeout, couldn't get response from Andy X. TimeoutInSyncResponseMs: {_producerConfiguration.Settings.TimeoutInSyncResponseMs}. You can increase TimeoutInSyncResponseMs at Producer Settings.");
 
                 }
                 callBackResponses.TryRemove(identityId, out result);

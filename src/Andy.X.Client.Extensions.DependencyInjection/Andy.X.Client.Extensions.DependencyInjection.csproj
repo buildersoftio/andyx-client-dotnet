@@ -2,8 +2,8 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>net9;net8;net7.0</TargetFrameworks>
-		<AssemblyVersion>3.0.2</AssemblyVersion>
-		<FileVersion>3.0.3</FileVersion>
+		<AssemblyVersion>3.0.4</AssemblyVersion>
+		<FileVersion>3.0.4</FileVersion>
 		<Product>Buildersoft Andy X</Product>
 		<Company>Buildersoft</Company>
 		<Authors>Buildersoft</Authors>
@@ -16,7 +16,7 @@
 		<RepositoryUrl>https://github.com/buildersoftio/andyxclient</RepositoryUrl>
 		<PackageTags>andyx eda streaming distributed</PackageTags>
 
-		<Version>3.0.3</Version>
+		<Version>3.0.4</Version>
 		<PackageLicenseFile>license.md</PackageLicenseFile>
 		<PackageIcon>andyX.png</PackageIcon>
 		<PackageId>Andy.X.Client.Extensions.Microsoft.DependencyInjection</PackageId>
